@@ -1,3 +1,37 @@
+# Project Overview
+
+MCP server exposing Google Patents search and retrieval via SerpApi. Two tools: `search_patents` and `get_patent`. Requires `SERPAPI_KEY` env var.
+
+## Key Files & Directories
+
+```
+src/
+  index.ts          # Entry point, MCP server setup
+  server.ts         # Tool registration
+  config.ts         # Env config (SERPAPI_KEY)
+  types.ts          # Shared TypeScript types
+  services/
+    serpapi.ts      # SerpApi HTTP client
+    patent.ts       # Patent fetch + HTML parsing
+  tools/
+    search-patents.ts
+    get-patent.ts
+  utils/
+    patent-data-extractor.ts
+    patent-id-resolver.ts  # Normalise patent IDs (EP, US, WO…)
+    content-truncator.ts
+tests/
+  unit/             # Vitest unit tests
+  integration-mocked-api.test.ts  # Full MCP flow with mock SerpApi
+  e2e-real-api.test.ts            # Real SerpApi (needs key)
+  helpers/          # Shared test utilities
+.github/workflows/
+  ci.yml            # Lint → unit → build → integration
+  release.yml       # Tag push → cross-compiled binaries
+Taskfile.yml        # Developer commands (task check, task test…)
+Dockerfile          # Container image
+```
+
 # Project Constitution
 
 Core principles guiding this project's development.
