@@ -32,7 +32,7 @@ export async function createMcpTestClient(): Promise<McpTestClient> {
   );
 
   const transport = new StdioClientTransport({
-    command: 'node',
+    command: 'bun',
     args: [serverPath, 'serve'],
     env: {
       ...process.env,

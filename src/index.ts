@@ -1,5 +1,5 @@
-#!/usr/bin/env node
-import { run } from './cli.js';
+#!/usr/bin/env bun
+import { run } from './cli/app.js';
 
 run().catch((err: unknown) => {
   process.stderr.write(

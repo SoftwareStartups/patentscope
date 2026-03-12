@@ -7,7 +7,13 @@ MCP server exposing Google Patents search and retrieval via SerpApi. Two tools: 
 ```
 src/
   index.ts          # Thin entry point (shebang + run())
-  cli.ts            # CLI parsing, help/version output, server bootstrap
+  cli/
+    app.ts          # Top-level subcommands (serve, search, get) + run()
+    format.ts       # Structured text formatters for CLI output
+    commands/
+      serve.ts      # MCP server start command
+      search.ts     # Patent search command
+      get.ts        # Patent details command
   server.ts         # Tool registration
   config.ts         # Env config (SERPAPI_KEY)
   types.ts          # Shared TypeScript types
