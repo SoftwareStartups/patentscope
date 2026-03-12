@@ -9,9 +9,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "node build/index.js",
-    "dev": "tsc -w & node --watch build/index.js",
-    "test": "npm run test:unit && npm run test:integration",
+    "start": "bun run build/index.js",
+    "dev": "tsc -w & bun run --watch build/index.js",
+    "test": "bun run test:unit && bun run test:integration",
     "test:unit": "vitest run --project unit",
     "test:unit:watch": "vitest --project unit",
     "test:integration": "vitest run --project integration",

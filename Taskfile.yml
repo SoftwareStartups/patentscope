@@ -4,12 +4,12 @@ tasks:
   install:
     desc: Install dependencies
     cmds:
-      - npm install
+      - bun install
 
   build:
     desc: Build TypeScript to JavaScript
     cmds:
-      - npm run build
+      - bun run build
 
   clean:
     desc: Remove build artifacts
@@ -20,22 +20,22 @@ tasks:
   format:
     desc: Format code with Prettier
     cmds:
-      - npm run format
+      - bun run format
 
   format:check:
     desc: Check code formatting
     cmds:
-      - npm run format:check
+      - bun run format:check
 
   lint:
     desc: Run ESLint
     cmds:
-      - npm run lint
+      - bun run lint
 
   typecheck:
     desc: Run TypeScript type checking
     cmds:
-      - npm run typecheck
+      - bun run typecheck
 
   check:
     desc: Run ESLint and TypeScript type checking
@@ -45,31 +45,31 @@ tasks:
     desc: Run unit and integration tests (excluding e2e)
     deps: [build]
     cmds:
-      - npm test
+      - bun test
 
   test:unit:
     desc: Run unit tests only
     deps: [build]
     cmds:
-      - npm run test:unit
+      - bun run test:unit
 
   test:integration:
     desc: Run integration tests with mocked SerpAPI calls
     deps: [build]
     cmds:
-      - npm run test:integration
+      - bun run test:integration
 
   test:e2e:
     desc: Run end-to-end tests with real SerpAPI calls
     deps: [build]
     cmds:
-      - npm run test:e2e
+      - bun run test:e2e
 
   test:all:
     desc: Run all tests including end-to-end
     deps: [build]
     cmds:
-      - npm run test:all
+      - bun run test:all
 
   ci:
     desc: Run full CI pipeline locally
