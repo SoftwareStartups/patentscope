@@ -140,3 +140,6 @@ dist
 
 # Auto Committer environment file
 .auto-committer/.env
+
+# Claude Code local settings
+.claude/settings.local.json
