@@ -55,7 +55,6 @@ export interface PatentData {
   grant_date?: string;
   publication_date?: string;
   abstract?: string;
-  [key: string]: unknown;
 }
 
 export interface PatentResult {
@@ -70,12 +69,12 @@ export interface PatentResult {
   filing_date?: string;
   grant_date?: string;
   publication_date?: string;
-  [key: string]: unknown;
 }
 
 export interface SerpApiResponse {
   organic_results?: PatentResult[];
-  [key: string]: unknown;
+  search_metadata?: { status?: string; [key: string]: unknown };
+  search_parameters?: Record<string, unknown>;
 }
 
 export interface SerpApiPatentDetailsResponse {

@@ -49,7 +49,7 @@ const main = async () => {
   setupProcessHandlers();
 
   // Initialize services
-  const serpApiClient = new SerpApiClient(config.serpApiKey, logger);
+  const serpApiClient = new SerpApiClient(config.serpApiKey, logger, 30000, config.serpApiBaseUrl);
   const patentService = new PatentService(serpApiClient, logger);
 
   // Create tools

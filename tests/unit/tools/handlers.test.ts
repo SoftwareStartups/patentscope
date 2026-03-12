@@ -173,14 +173,13 @@ describe('Tool Handlers', () => {
   describe('Get Patent Handler', () => {
     const mockPatentData: PatentData = {
       title: 'Test Patent',
-      patent_number: 'US7654321B2',
+      publication_number: 'US7654321B2',
       abstract: 'Test abstract',
-      inventors: ['John Doe'],
-      assignees: ['Test Corp'],
+      inventor: 'John Doe',
+      assignee: 'Test Corp',
       filing_date: '2020-01-01',
       publication_date: '2021-01-01',
       grant_date: '2021-06-01',
-      url: 'https://patents.google.com/patent/US7654321B2',
     };
 
     it('should fetch patent by URL', async () => {
@@ -382,14 +381,13 @@ describe('Tool Handlers', () => {
 
       const mockPatentData: PatentData = {
         title: 'Test Patent',
-        patent_number: 'US7654321B2',
+        publication_number: 'US7654321B2',
         abstract: 'Test abstract',
-        inventors: ['John Doe'],
-        assignees: ['Test Corp'],
+        inventor: 'John Doe',
+        assignee: 'Test Corp',
         filing_date: '2020-01-01',
         publication_date: '2021-01-01',
         grant_date: '2021-06-01',
-        url: 'https://patents.google.com/patent/US7654321B2',
       };
 
       const fetchPatentDataMock = vi.fn().mockResolvedValue(mockPatentData);

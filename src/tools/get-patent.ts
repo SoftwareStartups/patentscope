@@ -51,15 +51,13 @@ export const getPatentToolDefinition: Tool = {
  * Converts include array to FetchPatentOptions
  */
 function parseIncludeOptions(include: string[]): FetchPatentOptions {
-  const normalizedInclude = include.map((item) => item.toLowerCase());
-
   return {
-    includeClaims: normalizedInclude.includes('claims'),
-    includeDescription: normalizedInclude.includes('description'),
-    includeAbstract: normalizedInclude.includes('abstract'),
-    includeFamilyMembers: normalizedInclude.includes('family_members'),
-    includeCitations: normalizedInclude.includes('citations'),
-    includeMetadata: normalizedInclude.includes('metadata'),
+    includeClaims: include.includes('claims'),
+    includeDescription: include.includes('description'),
+    includeAbstract: include.includes('abstract'),
+    includeFamilyMembers: include.includes('family_members'),
+    includeCitations: include.includes('citations'),
+    includeMetadata: include.includes('metadata'),
   };
 }
 
@@ -76,9 +74,7 @@ function validateIncludeValues(include: string[]): void {
     'metadata',
   ];
 
-  const normalizedInclude = include.map((item) => item.toLowerCase());
-
-  for (const section of normalizedInclude) {
+  for (const section of include) {
     if (!validSections.includes(section)) {
       throw new McpError(
         ErrorCode.InvalidParams,
@@ -111,8 +107,9 @@ export function createGetPatentTool(
 
         // Process include parameter
         const includeParam = params.include || [];
-        const includeArray =
-          includeParam.length === 0 ? ['metadata', 'abstract'] : includeParam;
+        const includeArray = (
+          includeParam.length === 0 ? ['metadata', 'abstract'] : includeParam
+        ).map((item) => item.toLowerCase());
 
         // Validate include values
         validateIncludeValues(includeArray);

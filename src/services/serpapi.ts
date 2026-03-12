@@ -1,4 +1,3 @@
-import fetch, { type Response } from 'node-fetch';
 import winston from 'winston';
 import type {
   SearchPatentsArgs,
@@ -16,13 +15,12 @@ export class SerpApiClient {
     apiKey: string,
     logger: winston.Logger,
     timeoutMs = 30000,
-    baseUrl?: string
+    baseUrl = 'https://serpapi.com'
   ) {
     this.apiKey = apiKey;
     this.logger = logger;
     this.timeoutMs = timeoutMs;
-    this.baseUrl =
-      baseUrl || process.env.SERPAPI_BASE_URL || 'https://serpapi.com';
+    this.baseUrl = baseUrl;
   }
 
   async searchPatents(args: SearchPatentsArgs): Promise<SerpApiResponse> {
@@ -37,7 +35,6 @@ export class SerpApiClient {
       const searchParams = new URLSearchParams({
         engine: 'google_patents',
         q: query,
-        api_key: this.apiKey,
       });
 
       for (const [key, value] of Object.entries(otherParams)) {
@@ -46,10 +43,11 @@ export class SerpApiClient {
         }
       }
 
+      const logUrl = `${this.baseUrl}/search.json?${searchParams.toString()}`;
+      this.logger.info(`Calling SerpApi: ${logUrl}`);
+
+      searchParams.set('api_key', this.apiKey);
       const apiUrl = `${this.baseUrl}/search.json?${searchParams.toString()}`;
-      this.logger.info(
-        `Calling SerpApi: ${apiUrl.replace(this.apiKey, '****')}`
-      );
 
       const response = await fetch(apiUrl, { signal: controller.signal });
 
@@ -102,13 +100,13 @@ export class SerpApiClient {
       const searchParams = new URLSearchParams({
         engine: 'google_patents_details',
         patent_id: patentId,
-        api_key: this.apiKey,
       });
 
+      const logUrl = `${this.baseUrl}/search.json?${searchParams.toString()}`;
+      this.logger.info(`Calling SerpApi Patent Details: ${logUrl}`);
+
+      searchParams.set('api_key', this.apiKey);
       const apiUrl = `${this.baseUrl}/search.json?${searchParams.toString()}`;
-      this.logger.info(
-        `Calling SerpApi Patent Details: ${apiUrl.replace(this.apiKey, '****')}`
-      );
 
       const response = await fetch(apiUrl, { signal: controller.signal });
 

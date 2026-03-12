@@ -2,11 +2,7 @@
  * Custom assertions for patent data validation
  */
 
-import type {
-  PatentData,
-  PatentResult,
-  SerpApiResponse,
-} from '../../src/types.js';
+import type { PatentData, SerpApiResponse } from '../../src/types.js';
 
 export function assertValidSearchResponse(data: SerpApiResponse): void {
   if (!data.search_metadata) {
@@ -17,15 +13,8 @@ export function assertValidSearchResponse(data: SerpApiResponse): void {
     throw new Error('Response missing search_parameters');
   }
 
-  const metadata = data.search_metadata as { status?: string };
-  if (metadata.status && metadata.status !== 'Success') {
-    throw new Error(`SerpApi search status: ${metadata.status}`);
-  }
-}
-
-export function assertValidPatentResult(result: PatentResult): void {
-  if (!result.title && !result.patent_id) {
-    throw new Error('Patent result missing both title and patent_id');
+  if (data.search_metadata?.status && data.search_metadata.status !== 'Success') {
+    throw new Error(`SerpApi search status: ${data.search_metadata.status}`);
   }
 }
 
@@ -47,26 +36,3 @@ export function assertHasAbstract(data: PatentData): void {
   }
 }
 
-export function assertHasClaims(data: PatentData): void {
-  if (!data.claims || data.claims.length === 0) {
-    throw new Error('Patent data missing claims');
-  }
-}
-
-export function assertHasDescription(data: PatentData): void {
-  if (!data.description) {
-    throw new Error('Patent data missing description');
-  }
-}
-
-export function assertHasFamilyMembers(data: PatentData): void {
-  if (!data.family_members || data.family_members.length === 0) {
-    throw new Error('Patent data missing family members');
-  }
-}
-
-export function assertHasCitations(data: PatentData): void {
-  if (!data.citations) {
-    throw new Error('Patent data missing citations');
-  }
-}

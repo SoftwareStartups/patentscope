@@ -4,6 +4,7 @@ dotenv.config();
 
 export interface Config {
   serpApiKey: string;
+  serpApiBaseUrl: string;
   logLevel: string;
 }
 
@@ -16,6 +17,7 @@ export const getConfig = (): Config => {
 
   return {
     serpApiKey,
+    serpApiBaseUrl: process.env.SERPAPI_BASE_URL || 'https://serpapi.com',
     logLevel: process.env.LOG_LEVEL || 'info',
   };
 };
