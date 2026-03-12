@@ -33,7 +33,7 @@ export async function createMcpTestClient(): Promise<McpTestClient> {
 
   const transport = new StdioClientTransport({
     command: 'node',
-    args: [serverPath],
+    args: [serverPath, 'serve'],
     env: {
       ...process.env,
       SERPAPI_API_KEY: process.env.SERPAPI_API_KEY || 'test_api_key',

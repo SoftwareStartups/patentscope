@@ -26,4 +26,4 @@ RUN chown -R bun:bun /app
 
 # Start the MCP server
 USER bun
-CMD ["bun", "run", "build/index.js"]
+CMD ["bun", "run", "build/index.js", "serve"]

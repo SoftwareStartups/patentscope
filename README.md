@@ -26,25 +26,55 @@ npx -y @smithery/cli install @SoftwareStartups/google-patents-mcp --client claud
   * `search_patents` - Fast metadata search via SerpApi
   * `get_patent` - Comprehensive patent data retrieval (claims, description, family members, citations, metadata)
 * Uses SerpApi for both search and detailed patent information via structured endpoints.
-* Can be run directly using `npx` without local installation.
+* Can be run directly using `bunx` without local installation.
 
 ## Prerequisites
 
-* **Node.js:** Version 18 or higher is recommended.
-* **npm:** Required to run the `npx` command.
+* **Bun:** Version 1.0 or higher is recommended.
 * **SerpApi API Key:** You need a valid API key from
   [SerpApi](https://serpapi.com/) to use the Google Patents API.
 
-## Quick Start (Using npx)
+## Quick Start
 
-The easiest way to run this server is using `npx`. This command downloads
-(if necessary) and runs the server directly.
+The easiest way to run this server is using `bunx`:
 
 ```bash
-npx @softwarestartups/google-patents-mcp
+bunx @softwarestartups/google-patents-mcp serve
 ```
 
 The server will start and listen for MCP requests on standard input/output.
+
+## CLI Usage
+
+```
+Usage: google-patents-mcp <command> [flags]
+
+Commands:
+  serve    Start the MCP server on stdio
+
+Flags:
+  -h, --help      Show this help message
+  -v, --version   Show version information
+      --json      Output as JSON (use with --help or --version)
+```
+
+The `serve` command is required — bare invocation without a command prints help and exits with an error.
+
+All human-readable output goes to **stderr**. Stdout is reserved for the MCP JSON-RPC transport and for `--json` structured output.
+
+### JSON output mode
+
+Combine `--json` with `--version` or `--help` to get structured output on stdout, suitable for programmatic consumption:
+
+```bash
+# Version info as JSON
+bunx @softwarestartups/google-patents-mcp --version --json
+# → {"name":"@softwarestartups/google-patents-mcp","version":"1.0.0"}
+
+# Help as JSON
+bunx @softwarestartups/google-patents-mcp --help --json
+# → {"commands":[...],"flags":[...]}
+```
 
 ## Configuration
 
@@ -53,8 +83,6 @@ following ways:
 
 1. **Environment Variable (Recommended for MCP Hosts):**
    Set the `SERPAPI_API_KEY` environment variable when running the server.
-   MCP Host configurations often allow setting environment variables for
-   servers.
 
    Example MCP Host configuration snippet (`config.json` or similar):
 
@@ -62,10 +90,10 @@ following ways:
    {
      "mcpServers": {
        "google-patents-mcp": {
-         "command": "npx",
+         "command": "bunx",
          "args": [
-           "-y",
-           "@softwarestartups/google-patents-mcp"
+           "@softwarestartups/google-patents-mcp",
+           "serve"
          ],
          "env": {
            "SERPAPI_API_KEY": "YOUR_ACTUAL_SERPAPI_KEY"
@@ -76,7 +104,7 @@ following ways:
    ```
 
 2. **.env File:**
-   Create a `.env` file in the directory where you run the `npx` command
+   Create a `.env` file in the directory where you run the command
    (for local testing or if not using an MCP Host), or in your home directory
    (`~/.google-patents-mcp.env`), with the following content:
 
@@ -86,17 +114,31 @@ following ways:
    # LOG_LEVEL=debug
    ```
 
-   **Note:** While using a `.env` file is convenient for local testing, for
-   production or integration with MCP Hosts, setting the environment variable
-   directly via the host configuration is the recommended and more secure
-   approach. The primary intended use case is execution via `npx`, where
-   environment variables are typically managed by the calling process or
-   MCP Host.
-
    The server searches for `.env` files in the following order:
 
-   * `./.env` (relative to where `npx` is run)
+   * `./.env` (relative to where the command is run)
    * `~/.google-patents-mcp.env` (in your home directory)
+
+## OpenClaw Configuration
+
+To use with [OpenClaw](https://openclaw.dev/), add the following to your OpenClaw MCP server config:
+
+```json
+{
+  "mcpServers": {
+    "google-patents-mcp": {
+      "command": "bunx",
+      "args": [
+        "@softwarestartups/google-patents-mcp",
+        "serve"
+      ],
+      "env": {
+        "SERPAPI_API_KEY": "YOUR_ACTUAL_SERPAPI_KEY"
+      }
+    }
+  }
+}
+```
 
 ## Provided MCP Tools
 
@@ -300,13 +342,12 @@ console.log(patentData.citations);
 2. **Install dependencies:**
 
    ```bash
-   make install
-   # or: npm install
+   bun install
    ```
 
 3. **Set up environment variables:**
 
-   Create a `.env` file in the project root. First, create a `.env.example` file with the following content:
+   Create a `.env` file in the project root:
 
    ```dotenv
    # SerpApi Configuration
@@ -317,53 +358,42 @@ console.log(patentData.citations);
    # LOG_LEVEL=info
    ```
 
-   Then copy it to `.env` and edit with your actual API key:
-
-   ```bash
-   cp .env.example .env
-   # Edit .env and replace 'your_serpapi_key_here' with your actual SerpApi key
-   ```
-
 ### Development Workflow
 
 **Build the project:**
 
 ```bash
-make build
-# or: npm run build
+task build
 ```
 
 **Format code:**
 
 ```bash
-make format
-# or: npm run format
+task format
 ```
 
 **Check code quality (lint + typecheck):**
 
 ```bash
-make check
-# or: npm run lint && npm run typecheck
+task check
 ```
 
 **Run tests:**
 
 ```bash
-make test
-# or: npm test
+task test
 ```
 
 **Clean build artifacts:**
 
 ```bash
-make clean
+task clean
 ```
 
 **Full build pipeline:**
 
 ```bash
-make all
+task all
 # Runs: clean → install → build → check → test
 ```
 
@@ -372,13 +402,13 @@ make all
 **Production mode:**
 
 ```bash
-npm start
+bun run build/index.js serve
 ```
 
 **Development mode (with auto-rebuild):**
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 ## Testing
@@ -386,27 +416,20 @@ npm run dev
 The project includes unit tests, integration tests, and end-to-end tests with real API calls:
 
 ```bash
-# Install dependencies and build
-make install
-make build
-
-# Set up environment variables (see Development Setup section above)
-# The e2e tests will automatically load SERPAPI_API_KEY from .env file
-
 # Run all tests (unit + integration)
-make test
+task test
 
 # Run unit tests only
-make test-unit
+task test:unit
 
 # Run integration tests only
-make test-integration
+task test:integration
 
 # Run end-to-end tests with real SerpAPI calls
-make test-e2e
+task test:e2e
 
 # Run all tests including e2e
-make test-all
+task test:all
 ```
 
 ### Test Types
