@@ -69,13 +69,13 @@ jobs:
           bun build src/index.ts \
             --compile \
             --target=${{ matrix.target }} \
-            --outfile google-patents-mcp-${{ matrix.os }}-${{ matrix.arch }}
+            --outfile patentscope-${{ matrix.os }}-${{ matrix.arch }}
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v7
         with:
-          name: google-patents-mcp-${{ matrix.os }}-${{ matrix.arch }}
-          path: google-patents-mcp-${{ matrix.os }}-${{ matrix.arch }}
+          name: patentscope-${{ matrix.os }}-${{ matrix.arch }}
+          path: patentscope-${{ matrix.os }}-${{ matrix.arch }}
           retention-days: 1
 
   release:

@@ -1,11 +1,11 @@
 {
-  "name": "@softwarestartups/google-patents-mcp",
+  "name": "@softwarestartups/patentscope",
   "version": "1.0.0",
   "description": "MCP server for searching Google Patents via SerpApi",
   "main": "build/index.js",
   "type": "module",
   "bin": {
-    "google-patents-mcp": "build/index.js"
+    "patentscope": "build/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -32,11 +32,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SoftwareStartups/google-patents-mcp.git"
+    "url": "git+https://github.com/SoftwareStartups/patentscope.git"
   },
-  "homepage": "https://github.com/SoftwareStartups/google-patents-mcp#readme",
+  "homepage": "https://github.com/SoftwareStartups/patentscope#readme",
   "bugs": {
-    "url": "https://github.com/SoftwareStartups/google-patents-mcp/issues"
+    "url": "https://github.com/SoftwareStartups/patentscope/issues"
   },
   "files": [
     "README.md",

@@ -11,7 +11,7 @@ import {
 import winston from 'winston';
 import type { ToolDefinition } from './tools/index.js';
 
-export class GooglePatentsServer {
+export class PatentScopeServer {
   private readonly server: Server;
   private readonly logger: winston.Logger;
   private readonly tools: Map<string, ToolDefinition>;
@@ -24,10 +24,10 @@ export class GooglePatentsServer {
     this.logger = logger;
     this.tools = new Map(tools.map((tool) => [tool.definition.name, tool]));
 
-    this.logger.debug('Initializing Google Patents Server');
+    this.logger.debug('Initializing PatentScope Server');
     this.server = new Server(
       {
-        name: 'google-patents-server',
+        name: 'patentscope',
         version,
       },
       {
@@ -43,7 +43,7 @@ export class GooglePatentsServer {
     this.setupHandlers();
     this.setupErrorHandlers();
 
-    this.logger.debug('Google Patents Server initialization completed');
+    this.logger.debug('PatentScope Server initialization completed');
   }
 
   private setupHandlers(): void {
@@ -99,11 +99,11 @@ export class GooglePatentsServer {
   }
 
   async run(): Promise<void> {
-    this.logger.debug('Starting Google Patents MCP server');
+    this.logger.debug('Starting PatentScope MCP server');
     const transport = new StdioServerTransport();
     this.logger.debug('Created StdioServerTransport');
     await this.server.connect(transport);
-    this.logger.info('Google Patents MCP server running on stdio');
+    this.logger.info('PatentScope MCP server running on stdio');
     this.logger.debug(
       'Server connected to transport and ready to process requests'
     );

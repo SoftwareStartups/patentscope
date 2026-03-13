@@ -2,7 +2,7 @@ import { command } from 'cmd-ts';
 import { readFileSync } from 'fs';
 import { getConfig } from '../../config.js';
 import { createLogger } from '../../logger.js';
-import { GooglePatentsServer } from '../../server.js';
+import { PatentScopeServer } from '../../server.js';
 import { PatentService } from '../../services/patent.js';
 import { SerpApiClient } from '../../services/serpapi.js';
 import { createGetPatentTool, createSearchPatentsTool } from '../../tools/index.js';
@@ -47,7 +47,7 @@ export const serve = command({
     const config = getConfig();
     const logger = createLogger(config.logLevel);
 
-    logger.info('=== Google Patents Server started ===');
+    logger.info('=== PatentScope Server started ===');
     logger.info('SERPAPI_API_KEY found.');
 
     setupProcessHandlers(logger);
@@ -65,7 +65,7 @@ export const serve = command({
       createGetPatentTool(patentService, logger),
     ];
 
-    const server = new GooglePatentsServer(packageJson.version, logger, tools);
+    const server = new PatentScopeServer(packageJson.version, logger, tools);
     await server.run();
   },
 });

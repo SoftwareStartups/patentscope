@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-describe('Google Patents MCP Server', () => {
+describe('PatentScope MCP Server', () => {
   describe('Server Initialization', () => {
     it('should initialize with tools', async () => {
       const mockLogger = {
@@ -39,19 +39,19 @@ describe('Google Patents MCP Server', () => {
         }),
       };
 
-      const { GooglePatentsServer } = await import('../../src/server.js');
+      const { PatentScopeServer } = await import('../../src/server.js');
 
-      const server = new GooglePatentsServer('1.0.0', mockLogger as never, [
+      const server = new PatentScopeServer('1.0.0', mockLogger as never, [
         mockTool1,
         mockTool2,
       ]);
 
       expect(server).toBeDefined();
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        'Initializing Google Patents Server'
+        'Initializing PatentScope Server'
       );
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        'Google Patents Server initialization completed'
+        'PatentScope Server initialization completed'
       );
     });
   });

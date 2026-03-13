@@ -9,7 +9,7 @@ const packageJson = JSON.parse(
 ) as { version: string };
 
 const app = subcommands({
-  name: 'google-patents-mcp',
+  name: 'patentscope',
   version: packageJson.version,
   cmds: { serve, search, get },
 });
