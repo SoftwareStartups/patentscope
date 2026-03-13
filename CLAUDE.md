@@ -95,6 +95,12 @@ Technical standards and practices for code quality.
   - `task check` - to verify code quality and types
   - `task test` - to ensure all tests pass
 
+## GitHub Actions
+
+- Always pin actions to full semver tags (e.g., `actions/checkout@v6.0.2`, not `@v4` or `@v6`)
+- To discover the latest version of an action before pinning, use:
+  `gh api repos/<owner>/<action>/releases/latest --jq '.tag_name'`
+
 # MCP Server Best Practices
 
 Standards specific to Model Context Protocol server implementation.
