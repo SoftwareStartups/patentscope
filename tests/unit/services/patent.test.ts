@@ -1,7 +1,6 @@
 import { describe, expect, it, mock } from 'bun:test';
 
 describe('PatentService', () => {
-
   describe('Patent Data Fetching', () => {
     it('should fetch patent data with default options (metadata and abstract)', async () => {
       const mockLogger = {

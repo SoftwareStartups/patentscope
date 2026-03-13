@@ -152,7 +152,9 @@ describe('Tool Handlers', () => {
     });
 
     it('should handle errors from SerpApiClient', async () => {
-      const searchPatentsMock = mock().mockRejectedValue(new Error('API error'));
+      const searchPatentsMock = mock().mockRejectedValue(
+        new Error('API error')
+      );
       const mockSerpApiClient = {
         searchPatents: searchPatentsMock,
       } as unknown as SerpApiClient;
@@ -228,7 +230,10 @@ describe('Tool Handlers', () => {
     });
 
     it('should fetch patent with specific sections', async () => {
-      const fetchPatentDataMock = mock().mockResolvedValue({ ...mockPatentData, claims: ['Claim 1'] });
+      const fetchPatentDataMock = mock().mockResolvedValue({
+        ...mockPatentData,
+        claims: ['Claim 1'],
+      });
       const mockPatentService = {
         fetchPatentData: fetchPatentDataMock,
       } as unknown as PatentService;
@@ -334,7 +339,9 @@ describe('Tool Handlers', () => {
     });
 
     it('should handle errors from PatentService', async () => {
-      const fetchPatentDataMock = mock().mockRejectedValue(new Error('Service error'));
+      const fetchPatentDataMock = mock().mockRejectedValue(
+        new Error('Service error')
+      );
       const mockPatentService = {
         fetchPatentData: fetchPatentDataMock,
       } as unknown as PatentService;
