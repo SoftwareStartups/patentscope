@@ -16,8 +16,8 @@ startCommand:
     # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
     |-
     (config) => ({
-      command: 'node',
-      args: ['build/index.js'],
+      command: 'bunx',
+      args: ['@softwarestartups/patentscope', 'serve'],
       env: { SERPAPI_API_KEY: config.serpapiApiKey }
     })
   exampleConfig:

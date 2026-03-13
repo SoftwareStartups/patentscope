@@ -1,7 +1,7 @@
-# Google Patents MCP Server (`google-patents-mcp`)
+# Google Patents MCP Server (`patentscope`)
 
-[![smithery badge](https://smithery.ai/badge/@SoftwareStartups/google-patents-mcp)](https://smithery.ai/server/@SoftwareStartups/google-patents-mcp)
-[![npm version](https://badge.fury.io/js/%40softwarestartups%2Fgoogle-patents-mcp.svg)](https://badge.fury.io/js/%40softwarestartups%2Fgoogle-patents-mcp)
+[![smithery badge](https://smithery.ai/badge/@SoftwareStartups/patentscope)](https://smithery.ai/server/@SoftwareStartups/patentscope)
+[![npm version](https://badge.fury.io/js/%40softwarestartups%2Fpatentscope.svg)](https://badge.fury.io/js/%40softwarestartups%2Fpatentscope)
 
 This project provides a Model Context Protocol (MCP) server that allows
 searching Google Patents information via the
@@ -14,10 +14,10 @@ This project is a fork of the original [google-patents-mcp](https://github.com/K
 ## Installing via Smithery
 
 To install Google Patents MCP Server for Claude Desktop automatically via
-[Smithery](https://smithery.ai/server/@SoftwareStartups/google-patents-mcp):
+[Smithery](https://smithery.ai/server/@SoftwareStartups/patentscope):
 
 ```bash
-npx -y @smithery/cli install @SoftwareStartups/google-patents-mcp --client claude
+bunx @smithery/cli install @SoftwareStartups/patentscope --client claude
 ```
 
 ## Features
@@ -26,7 +26,7 @@ npx -y @smithery/cli install @SoftwareStartups/google-patents-mcp --client claud
   * `search_patents` - Fast metadata search via SerpApi
   * `get_patent` - Comprehensive patent data retrieval (claims, description, family members, citations, metadata)
 * Uses SerpApi for both search and detailed patent information via structured endpoints.
-* Can be run directly using `bunx` without local installation.
+* Can be run via `bunx` without local installation, or using a pre-built binary with no runtime required.
 
 ## Prerequisites
 
@@ -39,7 +39,7 @@ npx -y @smithery/cli install @SoftwareStartups/google-patents-mcp --client claud
 The easiest way to run this server is using `bunx`:
 
 ```bash
-bunx @softwarestartups/google-patents-mcp serve
+bunx @softwarestartups/patentscope serve
 ```
 
 The server will start and listen for MCP requests on standard input/output.
@@ -47,7 +47,7 @@ The server will start and listen for MCP requests on standard input/output.
 ## CLI Usage
 
 ```
-Usage: google-patents-mcp <command> [flags]
+Usage: patentscope <command> [flags]
 
 Commands:
   serve    Start the MCP server on stdio
@@ -68,11 +68,11 @@ Combine `--json` with `--version` or `--help` to get structured output on stdout
 
 ```bash
 # Version info as JSON
-bunx @softwarestartups/google-patents-mcp --version --json
-# → {"name":"@softwarestartups/google-patents-mcp","version":"1.0.0"}
+bunx @softwarestartups/patentscope --version --json
+# → {"name":"@softwarestartups/patentscope","version":"1.0.0"}
 
 # Help as JSON
-bunx @softwarestartups/google-patents-mcp --help --json
+bunx @softwarestartups/patentscope --help --json
 # → {"commands":[...],"flags":[...]}
 ```
 
@@ -86,13 +86,31 @@ following ways:
 
    Example MCP Host configuration snippet (`config.json` or similar):
 
+   Using a pre-built binary (no runtime required — download from [GitHub Releases](https://github.com/SoftwareStartups/patentscope/releases)):
+
    ```json
    {
      "mcpServers": {
-       "google-patents-mcp": {
+       "patentscope": {
+         "command": "/path/to/patentscope-darwin-arm64",
+         "args": ["serve"],
+         "env": {
+           "SERPAPI_API_KEY": "YOUR_ACTUAL_SERPAPI_KEY"
+         }
+       }
+     }
+   }
+   ```
+
+   Or using `bunx`:
+
+   ```json
+   {
+     "mcpServers": {
+       "patentscope": {
          "command": "bunx",
          "args": [
-           "@softwarestartups/google-patents-mcp",
+           "@softwarestartups/patentscope",
            "serve"
          ],
          "env": {
@@ -106,7 +124,7 @@ following ways:
 2. **.env File:**
    Create a `.env` file in the directory where you run the command
    (for local testing or if not using an MCP Host), or in your home directory
-   (`~/.google-patents-mcp.env`), with the following content:
+   (`~/.patentscope.env`), with the following content:
 
    ```dotenv
    SERPAPI_API_KEY=YOUR_ACTUAL_SERPAPI_KEY
@@ -117,7 +135,7 @@ following ways:
    The server searches for `.env` files in the following order:
 
    * `./.env` (relative to where the command is run)
-   * `~/.google-patents-mcp.env` (in your home directory)
+   * `~/.patentscope.env` (in your home directory)
 
 ## OpenClaw Configuration
 
@@ -126,10 +144,10 @@ To use with [OpenClaw](https://openclaw.dev/), add the following to your OpenCla
 ```json
 {
   "mcpServers": {
-    "google-patents-mcp": {
+    "patentscope": {
       "command": "bunx",
       "args": [
-        "@softwarestartups/google-patents-mcp",
+        "@softwarestartups/patentscope",
         "serve"
       ],
       "env": {
@@ -330,7 +348,7 @@ console.log(patentData.citations);
 
 ## Binary Releases
 
-Pre-built binaries for all supported platforms are available on the [GitHub Releases](https://github.com/SoftwareStartups/google-patents-mcp/releases) page. No Bun or Node.js installation required.
+Pre-built binaries for all supported platforms are available on the [GitHub Releases](https://github.com/SoftwareStartups/patentscope/releases) page. No Bun or Node.js installation required.
 
 ### Supported platforms
 
@@ -345,7 +363,7 @@ Pre-built binaries for all supported platforms are available on the [GitHub Rele
 
 ```bash
 # Example: macOS arm64
-curl -L https://github.com/SoftwareStartups/google-patents-mcp/releases/latest/download/patentscope-darwin-arm64 -o patentscope
+curl -L https://github.com/SoftwareStartups/patentscope/releases/latest/download/patentscope-darwin-arm64 -o patentscope
 chmod +x patentscope
 SERPAPI_API_KEY=your_key ./patentscope serve
 ```
@@ -368,8 +386,8 @@ The release workflow compiles all four platform binaries and publishes them to G
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/SoftwareStartups/google-patents-mcp.git
-   cd google-patents-mcp
+   git clone https://github.com/SoftwareStartups/patentscope.git
+   cd patentscope
    ```
 
 2. **Install dependencies:**
@@ -435,7 +453,7 @@ task all
 **Production mode:**
 
 ```bash
-bun run build/index.js serve
+bun src/index.ts serve
 ```
 
 **Development mode (with auto-rebuild):**
