@@ -328,6 +328,39 @@ console.log(patentData.family_members);
 console.log(patentData.citations);
 ```
 
+## Binary Releases
+
+Pre-built binaries for all supported platforms are available on the [GitHub Releases](https://github.com/SoftwareStartups/google-patents-mcp/releases) page. No Bun or Node.js installation required.
+
+### Supported platforms
+
+| Platform | Architecture | Binary |
+|----------|-------------|--------|
+| Linux    | x64         | `patentscope-linux-x64` |
+| Linux    | arm64       | `patentscope-linux-arm64` |
+| macOS    | x64         | `patentscope-darwin-x64` |
+| macOS    | arm64       | `patentscope-darwin-arm64` |
+
+### Download and run
+
+```bash
+# Example: macOS arm64
+curl -L https://github.com/SoftwareStartups/google-patents-mcp/releases/latest/download/patentscope-darwin-arm64 -o patentscope
+chmod +x patentscope
+SERPAPI_API_KEY=your_key ./patentscope serve
+```
+
+### Releasing
+
+Push a semver tag to trigger the release workflow. CI must pass before tagging:
+
+```bash
+git tag v1.2.3
+git push origin v1.2.3
+```
+
+The release workflow compiles all four platform binaries and publishes them to GitHub Releases automatically.
+
 ## Development
 
 ### Setup

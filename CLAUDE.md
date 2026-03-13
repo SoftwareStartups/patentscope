@@ -108,6 +108,14 @@ This project runs exclusively on Bun. Never use Node.js polyfills or Node-specif
 - To discover the latest version of an action before pinning, use:
   `gh api repos/<owner>/<action>/releases/latest --jq '.tag_name'`
 
+# Release Process
+
+- Releases are triggered by pushing a semver tag (`v*`) to the repository
+- CI must pass before tagging — the release workflow does not run CI itself
+- The `release.yml` workflow cross-compiles 4 Bun binaries (Linux/macOS × x64/arm64) and publishes them to GitHub Releases
+- Use `task compile` to build a binary for the current platform locally
+- Use `task compile:all` to build all 4 platform binaries locally
+
 # MCP Server Best Practices
 
 Standards specific to Model Context Protocol server implementation.
