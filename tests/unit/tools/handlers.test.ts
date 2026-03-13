@@ -4,7 +4,7 @@
  * These tests validate tool handlers work correctly with mocked services.
  */
 
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, mock } from 'bun:test';
 import winston from 'winston';
 import { PatentService } from '../../../src/services/patent.js';
 import { SerpApiClient } from '../../../src/services/serpapi.js';
@@ -26,10 +26,10 @@ const logger = winston.createLogger({
 describe('Tool Handlers', () => {
   describe('Tool Definitions', () => {
     it('should have properly defined search_patents tool', () => {
-      const searchPatentsMock = vi.fn();
+      const searchPatentsMock = mock();
       const mockSerpApiClient = {
         searchPatents: searchPatentsMock,
-        getPatentDetails: vi.fn(),
+        getPatentDetails: mock(),
       } as unknown as SerpApiClient;
 
       const tool = createSearchPatentsTool(mockSerpApiClient, logger);
@@ -43,7 +43,7 @@ describe('Tool Handlers', () => {
     });
 
     it('should have properly defined get_patent tool', () => {
-      const fetchPatentDataMock = vi.fn();
+      const fetchPatentDataMock = mock();
       const mockPatentService = {
         fetchPatentData: fetchPatentDataMock,
       } as unknown as PatentService;
@@ -65,7 +65,7 @@ describe('Tool Handlers', () => {
 
   describe('Search Patents Handler', () => {
     it('should search patents with query', async () => {
-      const searchPatentsMock = vi.fn().mockResolvedValue(mockSearchResponse);
+      const searchPatentsMock = mock().mockResolvedValue(mockSearchResponse);
       const mockSerpApiClient = {
         searchPatents: searchPatentsMock,
       } as unknown as SerpApiClient;
@@ -86,7 +86,7 @@ describe('Tool Handlers', () => {
     });
 
     it('should search with filters', async () => {
-      const searchPatentsMock = vi.fn().mockResolvedValue(mockSearchResponse);
+      const searchPatentsMock = mock().mockResolvedValue(mockSearchResponse);
       const mockSerpApiClient = {
         searchPatents: searchPatentsMock,
       } as unknown as SerpApiClient;
@@ -110,7 +110,7 @@ describe('Tool Handlers', () => {
     });
 
     it('should handle pagination', async () => {
-      const searchPatentsMock = vi.fn().mockResolvedValue(mockSearchResponse);
+      const searchPatentsMock = mock().mockResolvedValue(mockSearchResponse);
       const mockSerpApiClient = {
         searchPatents: searchPatentsMock,
       } as unknown as SerpApiClient;
@@ -132,7 +132,7 @@ describe('Tool Handlers', () => {
     });
 
     it('should search with assignee filter only', async () => {
-      const searchPatentsMock = vi.fn().mockResolvedValue(mockSearchResponse);
+      const searchPatentsMock = mock().mockResolvedValue(mockSearchResponse);
       const mockSerpApiClient = {
         searchPatents: searchPatentsMock,
       } as unknown as SerpApiClient;
@@ -152,9 +152,7 @@ describe('Tool Handlers', () => {
     });
 
     it('should handle errors from SerpApiClient', async () => {
-      const searchPatentsMock = vi
-        .fn()
-        .mockRejectedValue(new Error('API error'));
+      const searchPatentsMock = mock().mockRejectedValue(new Error('API error'));
       const mockSerpApiClient = {
         searchPatents: searchPatentsMock,
       } as unknown as SerpApiClient;
@@ -183,7 +181,7 @@ describe('Tool Handlers', () => {
     };
 
     it('should fetch patent by URL', async () => {
-      const fetchPatentDataMock = vi.fn().mockResolvedValue(mockPatentData);
+      const fetchPatentDataMock = mock().mockResolvedValue(mockPatentData);
       const mockPatentService = {
         fetchPatentData: fetchPatentDataMock,
       } as unknown as PatentService;
@@ -208,7 +206,7 @@ describe('Tool Handlers', () => {
     });
 
     it('should fetch patent by ID', async () => {
-      const fetchPatentDataMock = vi.fn().mockResolvedValue(mockPatentData);
+      const fetchPatentDataMock = mock().mockResolvedValue(mockPatentData);
       const mockPatentService = {
         fetchPatentData: fetchPatentDataMock,
       } as unknown as PatentService;
@@ -230,9 +228,7 @@ describe('Tool Handlers', () => {
     });
 
     it('should fetch patent with specific sections', async () => {
-      const fetchPatentDataMock = vi
-        .fn()
-        .mockResolvedValue({ ...mockPatentData, claims: ['Claim 1'] });
+      const fetchPatentDataMock = mock().mockResolvedValue({ ...mockPatentData, claims: ['Claim 1'] });
       const mockPatentService = {
         fetchPatentData: fetchPatentDataMock,
       } as unknown as PatentService;
@@ -268,7 +264,7 @@ describe('Tool Handlers', () => {
         citations: { cited_by: [], cites: [] },
       };
 
-      const fetchPatentDataMock = vi.fn().mockResolvedValue(fullMockPatentData);
+      const fetchPatentDataMock = mock().mockResolvedValue(fullMockPatentData);
       const mockPatentService = {
         fetchPatentData: fetchPatentDataMock,
       } as unknown as PatentService;
@@ -302,7 +298,7 @@ describe('Tool Handlers', () => {
     });
 
     it('should handle max_length parameter', async () => {
-      const fetchPatentDataMock = vi.fn().mockResolvedValue(mockPatentData);
+      const fetchPatentDataMock = mock().mockResolvedValue(mockPatentData);
       const mockPatentService = {
         fetchPatentData: fetchPatentDataMock,
       } as unknown as PatentService;
@@ -325,7 +321,7 @@ describe('Tool Handlers', () => {
     });
 
     it('should throw error when neither patent_url nor patent_id provided', async () => {
-      const fetchPatentDataMock = vi.fn();
+      const fetchPatentDataMock = mock();
       const mockPatentService = {
         fetchPatentData: fetchPatentDataMock,
       } as unknown as PatentService;
@@ -338,9 +334,7 @@ describe('Tool Handlers', () => {
     });
 
     it('should handle errors from PatentService', async () => {
-      const fetchPatentDataMock = vi
-        .fn()
-        .mockRejectedValue(new Error('Service error'));
+      const fetchPatentDataMock = mock().mockRejectedValue(new Error('Service error'));
       const mockPatentService = {
         fetchPatentData: fetchPatentDataMock,
       } as unknown as PatentService;
@@ -355,7 +349,7 @@ describe('Tool Handlers', () => {
     });
 
     it('should reject invalid include values', async () => {
-      const fetchPatentDataMock = vi.fn();
+      const fetchPatentDataMock = mock();
       const mockPatentService = {
         fetchPatentData: fetchPatentDataMock,
       } as unknown as PatentService;
@@ -374,7 +368,7 @@ describe('Tool Handlers', () => {
   describe('Handler Workflow', () => {
     it('should search and then fetch patent content', async () => {
       // Mock services
-      const searchPatentsMock = vi.fn().mockResolvedValue(mockSearchResponse);
+      const searchPatentsMock = mock().mockResolvedValue(mockSearchResponse);
       const mockSerpApiClient = {
         searchPatents: searchPatentsMock,
       } as unknown as SerpApiClient;
@@ -390,7 +384,7 @@ describe('Tool Handlers', () => {
         grant_date: '2021-06-01',
       };
 
-      const fetchPatentDataMock = vi.fn().mockResolvedValue(mockPatentData);
+      const fetchPatentDataMock = mock().mockResolvedValue(mockPatentData);
       const mockPatentService = {
         fetchPatentData: fetchPatentDataMock,
       } as unknown as PatentService;

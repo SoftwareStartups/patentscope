@@ -12,11 +12,11 @@
     "start": "bun run build/index.js",
     "dev": "tsc -w & bun run --watch build/index.js",
     "test": "bun run test:unit && bun run test:integration",
-    "test:unit": "vitest run --project unit",
-    "test:unit:watch": "vitest --project unit",
-    "test:integration": "vitest run --project integration",
-    "test:e2e": "vitest run --project e2e",
-    "test:all": "vitest run",
+    "test:unit": "bun test ./tests/unit --timeout 10000",
+    "test:unit:watch": "bun test --watch 'tests/unit/**/*.test.ts' --timeout 10000",
+    "test:integration": "bun test ./tests/integration-mocked-api.test.ts --timeout 30000",
+    "test:e2e": "LOG_LEVEL=error bun test ./tests/e2e-real-api.test.ts --timeout 120000",
+    "test:all": "bun test ./tests/unit ./tests/integration-mocked-api.test.ts --timeout 30000",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
     "lint": "eslint src tests",
@@ -51,19 +51,14 @@
     "winston": "^3.13.0"
   },
   "devDependencies": {
-    "@types/express": "^5.0.4",
-    "@types/nock": "^10.0.3",
     "@types/node": "^20.14.2",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "@vitest/coverage-v8": "^4.0.3",
+    "bun-types": "^1.3.10",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "express": "^5.1.0",
-    "nock": "^14.0.10",
     "prettier": "^3.2.5",
-    "tsx": "^4.7.1",
-    "typescript": "^5.4.5",
-    "vitest": "^4.0.3"
+    "typescript": "^5.4.5"
   }
 }

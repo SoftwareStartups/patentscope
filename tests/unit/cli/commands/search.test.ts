@@ -1,17 +1,15 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
 
-const { mockSearchPatents } = vi.hoisted(() => ({
-  mockSearchPatents: vi.fn(),
-}));
+const mockSearchPatents = mock();
 
-vi.mock('clerc', () => ({
+await mock.module('clerc', () => ({
   defineCommand: (config: Record<string, unknown>, handler: unknown) => ({
     ...config,
     handler,
   }),
 }));
 
-vi.mock('../../../../src/config.js', () => ({
+await mock.module('../../../../src/config.js', () => ({
   getConfig: () => ({
     serpApiKey: 'test-key',
     serpApiBaseUrl: 'https://serpapi.com',
@@ -19,17 +17,17 @@ vi.mock('../../../../src/config.js', () => ({
   }),
 }));
 
-vi.mock('../../../../src/logger.js', () => ({
+await mock.module('../../../../src/logger.js', () => ({
   createLogger: () => ({
-    error: vi.fn(),
-    info: vi.fn(),
-    debug: vi.fn(),
-    warn: vi.fn(),
-    close: vi.fn(),
+    error: mock(),
+    info: mock(),
+    debug: mock(),
+    warn: mock(),
+    close: mock(),
   }),
 }));
 
-vi.mock('../../../../src/services/serpapi.js', () => ({
+await mock.module('../../../../src/services/serpapi.js', () => ({
   SerpApiClient: class {
     searchPatents = mockSearchPatents;
   },
@@ -84,7 +82,7 @@ describe('search command', () => {
 
   beforeEach(() => {
     stdoutOutput = [];
-    vi.spyOn(process.stdout, 'write').mockImplementation(
+    spyOn(process.stdout, 'write').mockImplementation(
       (chunk: string | Uint8Array<ArrayBufferLike>) => {
         stdoutOutput.push(
           typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString()
@@ -100,7 +98,7 @@ describe('search command', () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    mock.restore();
   });
 
   it('searches with positional query', async () => {

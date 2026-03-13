@@ -1,22 +1,18 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, mock } from 'bun:test';
 
 describe('PatentService', () => {
-  beforeEach(() => {
-    vi.resetModules();
-    vi.clearAllMocks();
-  });
 
   describe('Patent Data Fetching', () => {
     it('should fetch patent data with default options (metadata and abstract)', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        getPatentDetails: vi.fn().mockResolvedValue({
+        getPatentDetails: mock().mockResolvedValue({
           title: 'Test Patent',
           publication_number: 'US1234567',
           assignees: ['Test Company'],
@@ -53,14 +49,14 @@ describe('PatentService', () => {
 
     it('should fetch patent data with claims included', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        getPatentDetails: vi.fn().mockResolvedValue({
+        getPatentDetails: mock().mockResolvedValue({
           title: 'Test Patent',
           publication_number: 'US1234567',
           claims: [
@@ -94,14 +90,14 @@ describe('PatentService', () => {
 
     it('should fetch patent data with abstract included separately', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        getPatentDetails: vi.fn().mockResolvedValue({
+        getPatentDetails: mock().mockResolvedValue({
           title: 'Test Patent',
           publication_number: 'US1234567',
           abstract: 'This is a test abstract for the patent.',
@@ -127,14 +123,14 @@ describe('PatentService', () => {
 
     it('should extract family members from worldwide_applications', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        getPatentDetails: vi.fn().mockResolvedValue({
+        getPatentDetails: mock().mockResolvedValue({
           title: 'Test Patent',
           publication_number: 'US1234567',
           worldwide_applications: {
@@ -191,14 +187,14 @@ describe('PatentService', () => {
 
     it('should extract citations from SerpAPI response', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        getPatentDetails: vi.fn().mockResolvedValue({
+        getPatentDetails: mock().mockResolvedValue({
           title: 'Test Patent',
           publication_number: 'US1234567',
           patent_citations: {
@@ -242,14 +238,14 @@ describe('PatentService', () => {
 
     it('should handle missing citations gracefully', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        getPatentDetails: vi.fn().mockResolvedValue({
+        getPatentDetails: mock().mockResolvedValue({
           title: 'Test Patent',
           publication_number: 'US1234567',
         }),
@@ -272,14 +268,14 @@ describe('PatentService', () => {
 
     it('should handle missing family members gracefully', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        getPatentDetails: vi.fn().mockResolvedValue({
+        getPatentDetails: mock().mockResolvedValue({
           title: 'Test Patent',
           publication_number: 'US1234567',
         }),
@@ -304,14 +300,14 @@ describe('PatentService', () => {
   describe('Patent ID Resolution', () => {
     it('should extract patent ID from Google Patents URL', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        getPatentDetails: vi.fn().mockResolvedValue({
+        getPatentDetails: mock().mockResolvedValue({
           title: 'Test Patent',
           publication_number: 'US1234567',
         }),
@@ -334,14 +330,14 @@ describe('PatentService', () => {
 
     it('should handle patent ID with path prefix', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        getPatentDetails: vi.fn().mockResolvedValue({
+        getPatentDetails: mock().mockResolvedValue({
           title: 'Test Patent',
           publication_number: 'US1234567',
         }),
@@ -362,14 +358,14 @@ describe('PatentService', () => {
 
     it('should pass through patent ID unchanged', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        getPatentDetails: vi.fn().mockResolvedValue({
+        getPatentDetails: mock().mockResolvedValue({
           title: 'Test Patent',
           publication_number: 'US1234567',
         }),
@@ -392,14 +388,14 @@ describe('PatentService', () => {
   describe('Content Truncation', () => {
     it('should handle description_link field correctly', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        getPatentDetails: vi.fn().mockResolvedValue({
+        getPatentDetails: mock().mockResolvedValue({
           title: 'Test Patent',
           publication_number: 'US1234567',
           description_link: 'https://serpapi.com/test-description.html',
@@ -424,14 +420,14 @@ describe('PatentService', () => {
 
     it('should truncate claims array to complete claims only', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        getPatentDetails: vi.fn().mockResolvedValue({
+        getPatentDetails: mock().mockResolvedValue({
           title: 'Test Patent',
           publication_number: 'US1234567',
           claims: [
@@ -463,14 +459,14 @@ describe('PatentService', () => {
 
     it('should not truncate when content is below max_length', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        getPatentDetails: vi.fn().mockResolvedValue({
+        getPatentDetails: mock().mockResolvedValue({
           title: 'Test Patent',
           publication_number: 'US1234567',
           claims: ['Short text.'],
@@ -499,14 +495,14 @@ describe('PatentService', () => {
   describe('Error Handling', () => {
     it('should throw error when SerpAPI returns error', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        getPatentDetails: vi.fn().mockRejectedValue(new Error('SerpAPI error')),
+        getPatentDetails: mock().mockRejectedValue(new Error('SerpAPI error')),
       };
 
       const { PatentService } = await import('../../../src/services/patent.js');
@@ -522,14 +518,14 @@ describe('PatentService', () => {
 
     it('should throw error when SerpAPI returns empty response', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        getPatentDetails: vi.fn().mockResolvedValue({
+        getPatentDetails: mock().mockResolvedValue({
           error:
             "Google Patents Details hasn't returned any results for this query.",
           search_metadata: {
@@ -552,14 +548,14 @@ describe('PatentService', () => {
 
     it('should throw error for network errors', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        getPatentDetails: vi.fn().mockRejectedValue(new Error('Network error')),
+        getPatentDetails: mock().mockRejectedValue(new Error('Network error')),
       };
 
       const { PatentService } = await import('../../../src/services/patent.js');

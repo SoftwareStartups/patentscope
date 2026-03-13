@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'bun:test';
 import { resolvePatentId } from '../../../src/utils/patent-id-resolver.js';
 
 describe('resolvePatentId', () => {

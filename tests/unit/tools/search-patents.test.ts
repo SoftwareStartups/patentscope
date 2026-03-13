@@ -1,17 +1,17 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, mock } from 'bun:test';
 import { createSearchPatentsTool } from '../../../src/tools/search-patents.js';
 
 describe('search_patents Tool', () => {
   it('should have correct tool definition', () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockSerpApiClient = {
-      searchPatents: vi.fn(),
+      searchPatents: mock(),
     };
 
     const tool = createSearchPatentsTool(
@@ -38,14 +38,14 @@ describe('search_patents Tool', () => {
 
   it('should not have content-related parameters', () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockSerpApiClient = {
-      searchPatents: vi.fn(),
+      searchPatents: mock(),
     };
 
     const tool = createSearchPatentsTool(
@@ -66,10 +66,10 @@ describe('search_patents Tool', () => {
 
   it('should call serpApiClient.searchPatents with provided args', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockResponse = {
@@ -83,7 +83,7 @@ describe('search_patents Tool', () => {
     };
 
     const mockSerpApiClient = {
-      searchPatents: vi.fn().mockResolvedValue(mockResponse),
+      searchPatents: mock().mockResolvedValue(mockResponse),
     };
 
     const tool = createSearchPatentsTool(
@@ -108,14 +108,14 @@ describe('search_patents Tool', () => {
 
   it('should handle errors from serpApiClient', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockSerpApiClient = {
-      searchPatents: vi.fn().mockRejectedValue(new Error('API Error')),
+      searchPatents: mock().mockRejectedValue(new Error('API Error')),
     };
 
     const tool = createSearchPatentsTool(
@@ -132,10 +132,10 @@ describe('search_patents Tool', () => {
 
   it('should work with empty query and only filters', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockResponse = {
@@ -148,7 +148,7 @@ describe('search_patents Tool', () => {
     };
 
     const mockSerpApiClient = {
-      searchPatents: vi.fn().mockResolvedValue(mockResponse),
+      searchPatents: mock().mockResolvedValue(mockResponse),
     };
 
     const tool = createSearchPatentsTool(

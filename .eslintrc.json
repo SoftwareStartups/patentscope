@@ -27,6 +27,14 @@
     "@typescript-eslint/no-misused-promises": ["error", { "checksVoidReturn": { "arguments": false } }],
     "no-console": "warn"
   },
-  "ignorePatterns": ["build/", "node_modules/", "*.js", "*.d.ts"]
+  "ignorePatterns": ["build/", "node_modules/", "*.js", "*.d.ts"],
+  "overrides": [
+    {
+      "files": ["tests/**/*.ts"],
+      "rules": {
+        "@typescript-eslint/await-thenable": "off"
+      }
+    }
+  ]
 }
 

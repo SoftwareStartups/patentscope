@@ -58,14 +58,13 @@ tasks:
 
   test:
     desc: Run unit and integration tests (excluding e2e)
-    deps: [build]
     cmds:
       - bun run test:unit
+      - task: build
       - bun run test:integration
 
   test:unit:
     desc: Run unit tests only
-    deps: [build]
     cmds:
       - bun run test:unit
 
@@ -85,7 +84,9 @@ tasks:
     desc: Run all tests including end-to-end
     deps: [build]
     cmds:
-      - bun run test:all
+      - bun run test:unit
+      - bun run test:integration
+      - bun run test:e2e
 
   ci:
     desc: Run full CI pipeline locally

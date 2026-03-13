@@ -1,18 +1,18 @@
 import { ErrorCode } from '@modelcontextprotocol/sdk/types.js';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, mock } from 'bun:test';
 import { createGetPatentTool } from '../../../src/tools/get-patent.js';
 
 describe('get_patent Tool', () => {
   it('should have correct tool definition', () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockPatentService = {
-      fetchPatentData: vi.fn(),
+      fetchPatentData: mock(),
     };
 
     const tool = createGetPatentTool(
@@ -31,10 +31,10 @@ describe('get_patent Tool', () => {
 
   it('should call patentService.fetchPatentData with patent_url and default include', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockPatentData = {
@@ -44,7 +44,7 @@ describe('get_patent Tool', () => {
     };
 
     const mockPatentService = {
-      fetchPatentData: vi.fn().mockResolvedValue(mockPatentData),
+      fetchPatentData: mock().mockResolvedValue(mockPatentData),
     };
 
     const tool = createGetPatentTool(
@@ -78,10 +78,10 @@ describe('get_patent Tool', () => {
 
   it('should call patentService.fetchPatentData with patent_id and default include', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockPatentData = {
@@ -90,7 +90,7 @@ describe('get_patent Tool', () => {
     };
 
     const mockPatentService = {
-      fetchPatentData: vi.fn().mockResolvedValue(mockPatentData),
+      fetchPatentData: mock().mockResolvedValue(mockPatentData),
     };
 
     const tool = createGetPatentTool(
@@ -123,10 +123,10 @@ describe('get_patent Tool', () => {
 
   it('should prefer patent_url over patent_id when both provided', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockPatentData = {
@@ -135,7 +135,7 @@ describe('get_patent Tool', () => {
     };
 
     const mockPatentService = {
-      fetchPatentData: vi.fn().mockResolvedValue(mockPatentData),
+      fetchPatentData: mock().mockResolvedValue(mockPatentData),
     };
 
     const tool = createGetPatentTool(
@@ -158,14 +158,14 @@ describe('get_patent Tool', () => {
 
   it('should throw error when neither patent_url nor patent_id provided', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockPatentService = {
-      fetchPatentData: vi.fn(),
+      fetchPatentData: mock(),
     };
 
     const tool = createGetPatentTool(
@@ -193,14 +193,14 @@ describe('get_patent Tool', () => {
 
   it('should handle errors from patentService', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockPatentService = {
-      fetchPatentData: vi.fn().mockRejectedValue(new Error('Fetch failed')),
+      fetchPatentData: mock().mockRejectedValue(new Error('Fetch failed')),
     };
 
     const tool = createGetPatentTool(
@@ -219,10 +219,10 @@ describe('get_patent Tool', () => {
 
   it('should include only claims when specified', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockPatentData = {
@@ -231,7 +231,7 @@ describe('get_patent Tool', () => {
     };
 
     const mockPatentService = {
-      fetchPatentData: vi.fn().mockResolvedValue(mockPatentData),
+      fetchPatentData: mock().mockResolvedValue(mockPatentData),
     };
 
     const tool = createGetPatentTool(
@@ -260,10 +260,10 @@ describe('get_patent Tool', () => {
 
   it('should return only requested content based on include array', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockPatentData = {
@@ -272,7 +272,7 @@ describe('get_patent Tool', () => {
     };
 
     const mockPatentService = {
-      fetchPatentData: vi.fn().mockResolvedValue(mockPatentData),
+      fetchPatentData: mock().mockResolvedValue(mockPatentData),
     };
 
     const tool = createGetPatentTool(
@@ -311,10 +311,10 @@ describe('get_patent Tool', () => {
 
   it('should pass max_length parameter to service', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockPatentData = {
@@ -323,7 +323,7 @@ describe('get_patent Tool', () => {
     };
 
     const mockPatentService = {
-      fetchPatentData: vi.fn().mockResolvedValue(mockPatentData),
+      fetchPatentData: mock().mockResolvedValue(mockPatentData),
     };
 
     const tool = createGetPatentTool(
@@ -352,10 +352,10 @@ describe('get_patent Tool', () => {
 
   it('should handle max_length with selective content sections', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockPatentData = {
@@ -364,7 +364,7 @@ describe('get_patent Tool', () => {
     };
 
     const mockPatentService = {
-      fetchPatentData: vi.fn().mockResolvedValue(mockPatentData),
+      fetchPatentData: mock().mockResolvedValue(mockPatentData),
     };
 
     const tool = createGetPatentTool(
@@ -394,10 +394,10 @@ describe('get_patent Tool', () => {
 
   it('should handle empty include array by defaulting to metadata and abstract', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockPatentData = {
@@ -407,7 +407,7 @@ describe('get_patent Tool', () => {
     };
 
     const mockPatentService = {
-      fetchPatentData: vi.fn().mockResolvedValue(mockPatentData),
+      fetchPatentData: mock().mockResolvedValue(mockPatentData),
     };
 
     const tool = createGetPatentTool(
@@ -436,10 +436,10 @@ describe('get_patent Tool', () => {
 
   it('should handle case-insensitive include values', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockPatentData = {
@@ -449,7 +449,7 @@ describe('get_patent Tool', () => {
     };
 
     const mockPatentService = {
-      fetchPatentData: vi.fn().mockResolvedValue(mockPatentData),
+      fetchPatentData: mock().mockResolvedValue(mockPatentData),
     };
 
     const tool = createGetPatentTool(
@@ -478,14 +478,14 @@ describe('get_patent Tool', () => {
 
   it('should throw error for invalid include value', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockPatentService = {
-      fetchPatentData: vi.fn(),
+      fetchPatentData: mock(),
     };
 
     const tool = createGetPatentTool(
@@ -518,10 +518,10 @@ describe('get_patent Tool', () => {
 
   it('should include only abstract when specified', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockPatentData = {
@@ -530,7 +530,7 @@ describe('get_patent Tool', () => {
     };
 
     const mockPatentService = {
-      fetchPatentData: vi.fn().mockResolvedValue(mockPatentData),
+      fetchPatentData: mock().mockResolvedValue(mockPatentData),
     };
 
     const tool = createGetPatentTool(
@@ -559,10 +559,10 @@ describe('get_patent Tool', () => {
 
   it('should handle multiple include sections', async () => {
     const mockLogger = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: mock(),
+      warn: mock(),
+      error: mock(),
+      debug: mock(),
     };
 
     const mockPatentData = {
@@ -577,7 +577,7 @@ describe('get_patent Tool', () => {
     };
 
     const mockPatentService = {
-      fetchPatentData: vi.fn().mockResolvedValue(mockPatentData),
+      fetchPatentData: mock().mockResolvedValue(mockPatentData),
     };
 
     const tool = createGetPatentTool(

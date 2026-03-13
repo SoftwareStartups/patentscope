@@ -1,14 +1,14 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, mock } from 'bun:test';
 
 describe('PatentScope MCP Server', () => {
   describe('Server Initialization', () => {
     it('should initialize with tools', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
-        close: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
+        close: mock(),
       };
 
       const mockTool1 = {
@@ -20,7 +20,7 @@ describe('PatentScope MCP Server', () => {
             properties: {},
           },
         },
-        handler: vi.fn().mockResolvedValue({
+        handler: mock().mockResolvedValue({
           content: [{ type: 'text' as const, text: 'result1' }],
         }),
       };
@@ -34,7 +34,7 @@ describe('PatentScope MCP Server', () => {
             properties: {},
           },
         },
-        handler: vi.fn().mockResolvedValue({
+        handler: mock().mockResolvedValue({
           content: [{ type: 'text' as const, text: 'result2' }],
         }),
       };
@@ -59,15 +59,15 @@ describe('PatentScope MCP Server', () => {
   describe('Tool Registration', () => {
     it('should register search_patents and get_patent_content tools', async () => {
       const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
+        info: mock(),
+        warn: mock(),
+        error: mock(),
+        debug: mock(),
       };
 
       const mockSerpApiClient = {
-        searchPatents: vi.fn(),
-        getPatentDetails: vi.fn(),
+        searchPatents: mock(),
+        getPatentDetails: mock(),
       };
 
       const { createSearchPatentsTool } = await import(
@@ -115,7 +115,7 @@ describe('PatentScope MCP Server', () => {
             properties: {},
           },
         },
-        handler: vi.fn().mockResolvedValue(mockResult1),
+        handler: mock().mockResolvedValue(mockResult1),
       };
 
       const mockTool2 = {
@@ -127,7 +127,7 @@ describe('PatentScope MCP Server', () => {
             properties: {},
           },
         },
-        handler: vi.fn().mockResolvedValue(mockResult2),
+        handler: mock().mockResolvedValue(mockResult2),
       };
 
       expect(mockTool1.handler).not.toHaveBeenCalled();

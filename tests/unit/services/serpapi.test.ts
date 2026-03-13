@@ -1,23 +1,29 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, mock } from 'bun:test';
 import { SerpApiClient } from '../../../src/services/serpapi.js';
 
 const mockLogger = {
-  info: vi.fn(),
-  warn: vi.fn(),
-  error: vi.fn(),
-  debug: vi.fn(),
+  info: mock(),
+  warn: mock(),
+  error: mock(),
+  debug: mock(),
 };
 
-function makeFetch(response: Partial<Response>): typeof fetch {
-  return vi.fn().mockResolvedValue(response) as unknown as typeof fetch;
+function makeFetch(response: Partial<Response>) {
+  return mock().mockResolvedValue(response);
 }
 
+let originalFetch: typeof fetch;
+
 beforeEach(() => {
-  vi.clearAllMocks();
+  originalFetch = globalThis.fetch;
+  mockLogger.info.mockReset();
+  mockLogger.warn.mockReset();
+  mockLogger.error.mockReset();
+  mockLogger.debug.mockReset();
 });
 
 afterEach(() => {
-  vi.unstubAllGlobals();
+  globalThis.fetch = originalFetch;
 });
 
 describe('SerpApiClient', () => {
@@ -31,7 +37,7 @@ describe('SerpApiClient', () => {
           organic_results: [],
         }),
     });
-    vi.stubGlobal('fetch', mockFetch);
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
 
     const client = new SerpApiClient('test_api_key', mockLogger as never);
     await client.searchPatents({ q: 'quantum computer' });
@@ -52,7 +58,7 @@ describe('SerpApiClient', () => {
       status: 200,
       json: () => Promise.resolve({ organic_results: [] }),
     });
-    vi.stubGlobal('fetch', mockFetch);
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
 
     const client = new SerpApiClient('test_api_key', mockLogger as never);
     await client.searchPatents({
@@ -64,8 +70,7 @@ describe('SerpApiClient', () => {
       status: 'GRANT',
     });
 
-    const callUrl = (mockFetch as ReturnType<typeof vi.fn>).mock
-      .calls[0][0] as string;
+    const callUrl = mockFetch.mock.calls[0][0] as string;
     expect(callUrl).toContain('page=2');
     expect(callUrl).toContain('num=20');
     expect(callUrl).toContain('sort=new');
@@ -88,14 +93,13 @@ describe('SerpApiClient', () => {
       status: 200,
       json: () => Promise.resolve(mockResponse),
     });
-    vi.stubGlobal('fetch', mockFetch);
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
 
     const client = new SerpApiClient('test_api_key', mockLogger as never);
     const result = await client.searchPatents({ assignee: 'Skyfora', num: 10 });
 
     expect(result).toEqual(mockResponse);
-    const callUrl = (mockFetch as ReturnType<typeof vi.fn>).mock
-      .calls[0][0] as string;
+    const callUrl = mockFetch.mock.calls[0][0] as string;
     expect(callUrl).toContain('engine=google_patents');
     expect(callUrl).toContain('q=');
     expect(callUrl).toContain('assignee=Skyfora');
@@ -109,7 +113,7 @@ describe('SerpApiClient', () => {
       statusText: 'Unauthorized',
       text: () => Promise.resolve('Invalid API key'),
     });
-    vi.stubGlobal('fetch', mockFetch);
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
 
     const client = new SerpApiClient('invalid_key', mockLogger as never);
     await expect(client.searchPatents({ q: 'test' })).rejects.toThrow(
@@ -123,7 +127,7 @@ describe('SerpApiClient', () => {
       status: 200,
       json: () => Promise.resolve({ organic_results: [] }),
     });
-    vi.stubGlobal('fetch', mockFetch);
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
 
     const client = new SerpApiClient(
       'secret_api_key_12345',
@@ -144,14 +148,14 @@ describe('SerpApiClient', () => {
   });
 
   it('should handle timeout scenarios', async () => {
-    const mockFetch = vi.fn().mockImplementation(() => {
+    const mockFetch = mock().mockImplementation(() => {
       const error = new Error('The operation was aborted') as Error & {
         name: string;
       };
       error.name = 'AbortError';
       return Promise.reject(error);
     });
-    vi.stubGlobal('fetch', mockFetch);
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
 
     const client = new SerpApiClient('test_key', mockLogger as never, 100);
     await expect(client.searchPatents({ q: 'test' })).rejects.toThrow(
@@ -170,7 +174,7 @@ describe('SerpApiClient', () => {
           description: 'Test description',
         }),
     });
-    vi.stubGlobal('fetch', mockFetch);
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
 
     const client = new SerpApiClient('test_api_key', mockLogger as never);
     await client.getPatentDetails('US1234567');
@@ -192,7 +196,7 @@ describe('SerpApiClient', () => {
       statusText: 'Not Found',
       text: () => Promise.resolve('Patent not found'),
     });
-    vi.stubGlobal('fetch', mockFetch);
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
 
     const client = new SerpApiClient('invalid_key', mockLogger as never);
     await expect(client.getPatentDetails('INVALID')).rejects.toThrow(
@@ -201,14 +205,14 @@ describe('SerpApiClient', () => {
   });
 
   it('should handle getPatentDetails timeout scenarios', async () => {
-    const mockFetch = vi.fn().mockImplementation(() => {
+    const mockFetch = mock().mockImplementation(() => {
       const error = new Error('The operation was aborted') as Error & {
         name: string;
       };
       error.name = 'AbortError';
       return Promise.reject(error);
     });
-    vi.stubGlobal('fetch', mockFetch);
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
 
     const client = new SerpApiClient('test_key', mockLogger as never, 100);
     await expect(client.getPatentDetails('US1234567')).rejects.toThrow(

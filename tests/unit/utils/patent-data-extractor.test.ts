@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'bun:test';
 import type { SerpApiPatentDetailsResponse } from '../../../src/types.js';
 import {
   extractCitations,
