@@ -34,18 +34,26 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          RESULT=$(gh run list \
-            --repo "${{ github.repository }}" \
-            --commit "${{ github.sha }}" \
-            --workflow "CI" \
-            --status "success" \
-            --limit 1 \
-            --json conclusion \
-            --jq '.[0].conclusion // "none"')
-          if [ "$RESULT" != "success" ]; then
-            echo "CI has not passed for commit ${{ github.sha }} (got: $RESULT). Aborting release."
+          echo "Waiting for CI to complete for commit ${{ github.sha }}..."
+          for i in $(seq 1 20); do
+            RUN_ID=$(gh run list \
+              --repo "${{ github.repository }}" \
+              --commit "${{ github.sha }}" \
+              --workflow "CI" \
+              --limit 1 \
+              --json databaseId \
+              --jq '.[0].databaseId // empty')
+            if [ -n "$RUN_ID" ]; then
+              break
+            fi
+            echo "CI run not found yet (attempt $i/20). Waiting 15s..."
+            sleep 15
+          done
+          if [ -z "$RUN_ID" ]; then
+            echo "No CI run found for commit ${{ github.sha }}. Aborting release."
             exit 1
           fi
+          gh run watch "$RUN_ID" --repo "${{ github.repository }}" --exit-status
 
       - name: Checkout code
         uses: actions/checkout@v6.0.2
