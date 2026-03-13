@@ -82,6 +82,13 @@ Technical standards and practices for code quality.
 - Use composition over inheritance
 - Keep functions small and focused on single responsibility
 
+## Runtime
+
+This project runs exclusively on Bun. Never use Node.js polyfills or Node-specific packages:
+- Use global `fetch` — do NOT import `node-fetch`
+- Use Bun's built-in APIs where available
+- Do not add `@types/node` or configure Node-specific settings
+
 ## Testing Requirements
 
 - Write unit tests for major features
