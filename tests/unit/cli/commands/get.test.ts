@@ -5,7 +5,10 @@ const { mockFetchPatentData } = vi.hoisted(() => ({
 }));
 
 vi.mock('clerc', () => ({
-  defineCommand: (config: Record<string, unknown>, handler: unknown) => ({ ...config, handler }),
+  defineCommand: (config: Record<string, unknown>, handler: unknown) => ({
+    ...config,
+    handler,
+  }),
 }));
 
 vi.mock('../../../../src/config.js', () => ({
@@ -55,7 +58,9 @@ const defaultCtx: GetContext = {
 };
 
 const { get } = await import('../../../../src/cli/commands/get.js');
-const handler = (get as unknown as { handler: (ctx: GetContext) => Promise<void> }).handler;
+const handler = (
+  get as unknown as { handler: (ctx: GetContext) => Promise<void> }
+).handler;
 
 describe('get command', () => {
   let stdoutOutput: string[];
@@ -64,7 +69,9 @@ describe('get command', () => {
     stdoutOutput = [];
     vi.spyOn(process.stdout, 'write').mockImplementation(
       (chunk: string | Uint8Array<ArrayBufferLike>) => {
-        stdoutOutput.push(typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString());
+        stdoutOutput.push(
+          typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString()
+        );
         return true;
       }
     );
@@ -101,7 +108,10 @@ describe('get command', () => {
   });
 
   it('outputs JSON with json flag', async () => {
-    await handler({ ...defaultCtx, flags: { ...defaultCtx.flags, json: true } });
+    await handler({
+      ...defaultCtx,
+      flags: { ...defaultCtx.flags, json: true },
+    });
     const output = JSON.parse(stdoutOutput.join('')) as Record<string, unknown>;
     expect(output.patent_id).toBe('US7654321B2');
     expect(output.title).toBe('Test Patent');

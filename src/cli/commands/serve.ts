@@ -5,7 +5,10 @@ import { createLogger } from '../../logger.js';
 import { PatentScopeServer } from '../../server.js';
 import { PatentService } from '../../services/patent.js';
 import { SerpApiClient } from '../../services/serpapi.js';
-import { createGetPatentTool, createSearchPatentsTool } from '../../tools/index.js';
+import {
+  createGetPatentTool,
+  createSearchPatentsTool,
+} from '../../tools/index.js';
 
 const packageJson = JSON.parse(
   readFileSync(new URL('../../../package.json', import.meta.url), 'utf-8')

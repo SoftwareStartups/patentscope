@@ -13,7 +13,10 @@ export function assertValidSearchResponse(data: SerpApiResponse): void {
     throw new Error('Response missing search_parameters');
   }
 
-  if (data.search_metadata?.status && data.search_metadata.status !== 'Success') {
+  if (
+    data.search_metadata?.status &&
+    data.search_metadata.status !== 'Success'
+  ) {
     throw new Error(`SerpApi search status: ${data.search_metadata.status}`);
   }
 }
@@ -35,4 +38,3 @@ export function assertHasAbstract(data: PatentData): void {
     throw new Error('Patent data missing abstract');
   }
 }
-

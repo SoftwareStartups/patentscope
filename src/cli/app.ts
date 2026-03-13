@@ -9,7 +9,17 @@ const packageJson = JSON.parse(
   readFileSync(new URL('../../package.json', import.meta.url), 'utf-8')
 ) as { version: string };
 
-export async function run(argv: string[] = process.argv.slice(2)): Promise<void> {
+function resolveArgv(argv: string[]): string[] {
+  if (argv.length === 0) return ['--help'];
+  if (argv[0] === 'get' && !argv.slice(1).some((a) => !a.startsWith('-'))) {
+    return ['get', '--help'];
+  }
+  return argv;
+}
+
+export async function run(
+  argv: string[] = process.argv.slice(2)
+): Promise<void> {
   await Cli()
     .scriptName('patentscope')
     .version(packageJson.version)
@@ -17,5 +27,5 @@ export async function run(argv: string[] = process.argv.slice(2)): Promise<void>
     .command(serve)
     .command(search)
     .command(get)
-    .parse(argv);
+    .parse(resolveArgv(argv));
 }

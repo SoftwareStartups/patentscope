@@ -69,7 +69,10 @@ export const get = defineCommand(
       maxLength: ctx.flags.maxLength,
     };
 
-    const data = await patentService.fetchPatentData(ctx.parameters.patentId, options);
+    const data = await patentService.fetchPatentData(
+      ctx.parameters.patentId,
+      options
+    );
 
     if (ctx.flags.json) {
       process.stdout.write(JSON.stringify(data, null, 2) + '\n');

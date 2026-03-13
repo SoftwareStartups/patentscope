@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { formatPatentData, formatSearchResults } from '../../../src/cli/format.js';
+import {
+  formatPatentData,
+  formatSearchResults,
+} from '../../../src/cli/format.js';
 import type { PatentData, PatentResult } from '../../../src/types.js';
 
 describe('formatSearchResults', () => {
@@ -24,7 +27,9 @@ describe('formatSearchResults', () => {
     expect(output).toContain('Assignee:  Tech Corporation');
     expect(output).toContain('Inventor:  John Doe');
     expect(output).toContain('Filed:     2020-02-01');
-    expect(output).toContain('Snippet:   A method for implementing quantum computing...');
+    expect(output).toContain(
+      'Snippet:   A method for implementing quantum computing...'
+    );
     expect(output).toContain('1 result(s)');
   });
 

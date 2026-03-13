@@ -5,7 +5,10 @@ const { mockSearchPatents } = vi.hoisted(() => ({
 }));
 
 vi.mock('clerc', () => ({
-  defineCommand: (config: Record<string, unknown>, handler: unknown) => ({ ...config, handler }),
+  defineCommand: (config: Record<string, unknown>, handler: unknown) => ({
+    ...config,
+    handler,
+  }),
 }));
 
 vi.mock('../../../../src/config.js', () => ({
@@ -72,7 +75,9 @@ const defaultCtx: SearchContext = {
 
 // Import after mocks are set up
 const { search } = await import('../../../../src/cli/commands/search.js');
-const handler = (search as unknown as { handler: (ctx: SearchContext) => Promise<void> }).handler;
+const handler = (
+  search as unknown as { handler: (ctx: SearchContext) => Promise<void> }
+).handler;
 
 describe('search command', () => {
   let stdoutOutput: string[];
@@ -81,12 +86,16 @@ describe('search command', () => {
     stdoutOutput = [];
     vi.spyOn(process.stdout, 'write').mockImplementation(
       (chunk: string | Uint8Array<ArrayBufferLike>) => {
-        stdoutOutput.push(typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString());
+        stdoutOutput.push(
+          typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString()
+        );
         return true;
       }
     );
     mockSearchPatents.mockResolvedValue({
-      organic_results: [{ title: 'Test Patent', patent_id: 'US123', assignee: 'TestCo' }],
+      organic_results: [
+        { title: 'Test Patent', patent_id: 'US123', assignee: 'TestCo' },
+      ],
     });
   });
 
@@ -95,7 +104,10 @@ describe('search command', () => {
   });
 
   it('searches with positional query', async () => {
-    await handler({ ...defaultCtx, parameters: { query: 'quantum computing' } });
+    await handler({
+      ...defaultCtx,
+      parameters: { query: 'quantum computing' },
+    });
     expect(mockSearchPatents).toHaveBeenCalledWith(
       expect.objectContaining({ q: 'quantum computing' })
     );

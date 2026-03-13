@@ -20,7 +20,10 @@ export const search = defineCommand(
       assignee: { type: String, description: 'Assignee name' },
       country: { type: String, description: 'Country code' },
       language: { type: String, description: 'Language code' },
-      status: { type: String, description: 'Patent status (GRANT/APPLICATION)' },
+      status: {
+        type: String,
+        description: 'Patent status (GRANT/APPLICATION)',
+      },
       type: { type: String, description: 'Patent type (PATENT/DESIGN)' },
       scholar: { type: Boolean, description: 'Include Google Scholar results' },
     },
@@ -46,7 +49,8 @@ export const search = defineCommand(
     if (ctx.flags.assignee) searchArgs.assignee = ctx.flags.assignee;
     if (ctx.flags.country) searchArgs.country = ctx.flags.country;
     if (ctx.flags.language) searchArgs.language = ctx.flags.language;
-    if (ctx.flags.status) searchArgs.status = ctx.flags.status as 'GRANT' | 'APPLICATION';
+    if (ctx.flags.status)
+      searchArgs.status = ctx.flags.status as 'GRANT' | 'APPLICATION';
     if (ctx.flags.type) searchArgs.type = ctx.flags.type as 'PATENT' | 'DESIGN';
     if (ctx.flags.scholar) searchArgs.scholar = true;
 
