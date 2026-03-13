@@ -4,14 +4,8 @@ const { mockFetchPatentData } = vi.hoisted(() => ({
   mockFetchPatentData: vi.fn(),
 }));
 
-vi.mock('cmd-ts', () => ({
-  command: (config: Record<string, unknown>) => config,
-  flag: () => undefined,
-  option: () => undefined,
-  positional: () => undefined,
-  optional: (t: unknown) => t,
-  string: {},
-  number: {},
+vi.mock('clerc', () => ({
+  defineCommand: (config: Record<string, unknown>, handler: unknown) => ({ ...config, handler }),
 }));
 
 vi.mock('../../../../src/config.js', () => ({
@@ -42,22 +36,26 @@ vi.mock('../../../../src/services/patent.js', () => ({
   },
 }));
 
-interface GetArgs {
-  patentId: string;
-  json: boolean;
-  include?: string;
-  maxLength?: number;
+interface GetContext {
+  parameters: { patentId: string };
+  flags: {
+    json: boolean;
+    include?: string;
+    maxLength?: number;
+  };
 }
 
-const defaultArgs: GetArgs = {
-  patentId: 'US7654321B2',
-  json: false,
-  include: undefined,
-  maxLength: undefined,
+const defaultCtx: GetContext = {
+  parameters: { patentId: 'US7654321B2' },
+  flags: {
+    json: false,
+    include: undefined,
+    maxLength: undefined,
+  },
 };
 
 const { get } = await import('../../../../src/cli/commands/get.js');
-const handler = (get as unknown as { handler: (args: GetArgs) => Promise<void> }).handler;
+const handler = (get as unknown as { handler: (ctx: GetContext) => Promise<void> }).handler;
 
 describe('get command', () => {
   let stdoutOutput: string[];
@@ -82,7 +80,7 @@ describe('get command', () => {
   });
 
   it('fetches patent with default includes', async () => {
-    await handler({ ...defaultArgs });
+    await handler({ ...defaultCtx });
     expect(mockFetchPatentData).toHaveBeenCalledWith('US7654321B2', {
       includeMetadata: true,
       includeAbstract: true,
@@ -95,7 +93,7 @@ describe('get command', () => {
   });
 
   it('outputs structured text by default', async () => {
-    await handler({ ...defaultArgs });
+    await handler({ ...defaultCtx });
     const output = stdoutOutput.join('');
     expect(output).toContain('Patent: US7654321B2');
     expect(output).toContain('Title:       Test Patent');
@@ -103,14 +101,18 @@ describe('get command', () => {
   });
 
   it('outputs JSON with json flag', async () => {
-    await handler({ ...defaultArgs, json: true });
+    await handler({ ...defaultCtx, flags: { ...defaultCtx.flags, json: true } });
     const output = JSON.parse(stdoutOutput.join('')) as Record<string, unknown>;
     expect(output.patent_id).toBe('US7654321B2');
     expect(output.title).toBe('Test Patent');
   });
 
   it('parses include option', async () => {
-    await handler({ ...defaultArgs, patentId: 'US123', include: 'claims,description' });
+    await handler({
+      ...defaultCtx,
+      parameters: { patentId: 'US123' },
+      flags: { ...defaultCtx.flags, include: 'claims,description' },
+    });
     expect(mockFetchPatentData).toHaveBeenCalledWith('US123', {
       includeMetadata: false,
       includeAbstract: false,
@@ -123,7 +125,11 @@ describe('get command', () => {
   });
 
   it('passes max-length option', async () => {
-    await handler({ ...defaultArgs, patentId: 'US123', maxLength: 5000 });
+    await handler({
+      ...defaultCtx,
+      parameters: { patentId: 'US123' },
+      flags: { ...defaultCtx.flags, maxLength: 5000 },
+    });
     expect(mockFetchPatentData).toHaveBeenCalledWith(
       'US123',
       expect.objectContaining({ maxLength: 5000 })
@@ -132,7 +138,11 @@ describe('get command', () => {
 
   it('throws on invalid include value', async () => {
     await expect(
-      handler({ ...defaultArgs, patentId: 'US123', include: 'invalid' })
+      handler({
+        ...defaultCtx,
+        parameters: { patentId: 'US123' },
+        flags: { ...defaultCtx.flags, include: 'invalid' },
+      })
     ).rejects.toThrow('Invalid include value: "invalid"');
   });
 });

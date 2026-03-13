@@ -24,7 +24,7 @@
       }
     ],
     "@typescript-eslint/no-floating-promises": "error",
-    "@typescript-eslint/no-misused-promises": "error",
+    "@typescript-eslint/no-misused-promises": ["error", { "checksVoidReturn": { "arguments": false } }],
     "no-console": "warn"
   },
   "ignorePatterns": ["build/", "node_modules/", "*.js", "*.d.ts"]

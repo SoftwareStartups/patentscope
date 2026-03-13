@@ -1,4 +1,4 @@
-import { command, flag, option, positional, optional, string, number } from 'cmd-ts';
+import { defineCommand } from 'clerc';
 import { getConfig } from '../../config.js';
 import { createLogger } from '../../logger.js';
 import { PatentService } from '../../services/patent.js';
@@ -26,30 +26,22 @@ function parseIncludeOptions(sections: string[]): FetchPatentOptions {
   };
 }
 
-export const get = command({
-  name: 'get',
-  description: 'Get patent details',
-  args: {
-    patentId: positional({
-      type: string,
-      displayName: 'patent-id',
-      description: 'Patent ID or URL',
-    }),
-    json: flag({ long: 'json', description: 'Output as JSON' }),
-    include: option({
-      type: optional(string),
-      long: 'include',
-      short: 'i',
-      description:
-        'Comma-separated sections (metadata,abstract,claims,description,family_members,citations)',
-    }),
-    maxLength: option({
-      type: optional(number),
-      long: 'max-length',
-      description: 'Maximum content length',
-    }),
+export const get = defineCommand(
+  {
+    name: 'get',
+    description: 'Get patent details',
+    parameters: ['<patentId>'] as const,
+    flags: {
+      include: {
+        type: String,
+        description:
+          'Comma-separated sections (metadata,abstract,claims,description,family_members,citations)',
+        short: 'i',
+      },
+      maxLength: { type: Number, description: 'Maximum content length' },
+    },
   },
-  handler: async (args) => {
+  async (ctx) => {
     const config = getConfig();
     const logger = createLogger('error');
     const serpApiClient = new SerpApiClient(
@@ -60,8 +52,8 @@ export const get = command({
     );
     const patentService = new PatentService(serpApiClient, logger);
 
-    const sections = args.include
-      ? args.include.split(',').map((s) => s.trim().toLowerCase())
+    const sections = ctx.flags.include
+      ? ctx.flags.include.split(',').map((s) => s.trim().toLowerCase())
       : ['metadata', 'abstract'];
 
     for (const section of sections) {
@@ -74,15 +66,15 @@ export const get = command({
 
     const options: FetchPatentOptions = {
       ...parseIncludeOptions(sections),
-      maxLength: args.maxLength,
+      maxLength: ctx.flags.maxLength,
     };
 
-    const data = await patentService.fetchPatentData(args.patentId, options);
+    const data = await patentService.fetchPatentData(ctx.parameters.patentId, options);
 
-    if (args.json) {
+    if (ctx.flags.json) {
       process.stdout.write(JSON.stringify(data, null, 2) + '\n');
     } else {
       process.stdout.write(formatPatentData(data) + '\n');
     }
-  },
-});
+  }
+);

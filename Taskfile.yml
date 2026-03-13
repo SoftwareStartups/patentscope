@@ -45,7 +45,8 @@ tasks:
     desc: Run unit and integration tests (excluding e2e)
     deps: [build]
     cmds:
-      - bun test
+      - bun run test:unit
+      - bun run test:integration
 
   test:unit:
     desc: Run unit tests only

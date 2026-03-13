@@ -1,4 +1,4 @@
-import { command } from 'cmd-ts';
+import { defineCommand } from 'clerc';
 import { readFileSync } from 'fs';
 import { getConfig } from '../../config.js';
 import { createLogger } from '../../logger.js';
@@ -39,11 +39,9 @@ function setupProcessHandlers(logger: ReturnType<typeof createLogger>): void {
   });
 }
 
-export const serve = command({
-  name: 'serve',
-  description: 'Start the MCP server on stdio',
-  args: {},
-  handler: async () => {
+export const serve = defineCommand(
+  { name: 'serve', description: 'Start the MCP server on stdio' },
+  async () => {
     const config = getConfig();
     const logger = createLogger(config.logLevel);
 
@@ -67,5 +65,5 @@ export const serve = command({
 
     const server = new PatentScopeServer(packageJson.version, logger, tools);
     await server.run();
-  },
-});
+  }
+);

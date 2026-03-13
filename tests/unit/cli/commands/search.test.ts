@@ -4,14 +4,8 @@ const { mockSearchPatents } = vi.hoisted(() => ({
   mockSearchPatents: vi.fn(),
 }));
 
-vi.mock('cmd-ts', () => ({
-  command: (config: Record<string, unknown>) => config,
-  flag: () => undefined,
-  option: () => undefined,
-  positional: () => undefined,
-  optional: (t: unknown) => t,
-  string: {},
-  number: {},
+vi.mock('clerc', () => ({
+  defineCommand: (config: Record<string, unknown>, handler: unknown) => ({ ...config, handler }),
 }));
 
 vi.mock('../../../../src/config.js', () => ({
@@ -38,43 +32,47 @@ vi.mock('../../../../src/services/serpapi.js', () => ({
   },
 }));
 
-interface SearchArgs {
-  query?: string;
-  json: boolean;
-  page?: number;
-  num?: number;
-  sort?: string;
-  before?: string;
-  after?: string;
-  inventor?: string;
-  assignee?: string;
-  country?: string;
-  language?: string;
-  status?: string;
-  type?: string;
-  scholar: boolean;
+interface SearchContext {
+  parameters: { query?: string };
+  flags: {
+    json: boolean;
+    page?: number;
+    num?: number;
+    sort?: string;
+    before?: string;
+    after?: string;
+    inventor?: string;
+    assignee?: string;
+    country?: string;
+    language?: string;
+    status?: string;
+    type?: string;
+    scholar: boolean;
+  };
 }
 
-const defaultArgs: SearchArgs = {
-  query: undefined,
-  json: false,
-  page: undefined,
-  num: undefined,
-  sort: undefined,
-  before: undefined,
-  after: undefined,
-  inventor: undefined,
-  assignee: undefined,
-  country: undefined,
-  language: undefined,
-  status: undefined,
-  type: undefined,
-  scholar: false,
+const defaultCtx: SearchContext = {
+  parameters: { query: undefined },
+  flags: {
+    json: false,
+    page: undefined,
+    num: undefined,
+    sort: undefined,
+    before: undefined,
+    after: undefined,
+    inventor: undefined,
+    assignee: undefined,
+    country: undefined,
+    language: undefined,
+    status: undefined,
+    type: undefined,
+    scholar: false,
+  },
 };
 
 // Import after mocks are set up
 const { search } = await import('../../../../src/cli/commands/search.js');
-const handler = (search as unknown as { handler: (args: SearchArgs) => Promise<void> }).handler;
+const handler = (search as unknown as { handler: (ctx: SearchContext) => Promise<void> }).handler;
 
 describe('search command', () => {
   let stdoutOutput: string[];
@@ -97,14 +95,14 @@ describe('search command', () => {
   });
 
   it('searches with positional query', async () => {
-    await handler({ ...defaultArgs, query: 'quantum computing' });
+    await handler({ ...defaultCtx, parameters: { query: 'quantum computing' } });
     expect(mockSearchPatents).toHaveBeenCalledWith(
       expect.objectContaining({ q: 'quantum computing' })
     );
   });
 
   it('outputs structured text by default', async () => {
-    await handler({ ...defaultArgs, query: 'test' });
+    await handler({ ...defaultCtx, parameters: { query: 'test' } });
     const output = stdoutOutput.join('');
     expect(output).toContain('Title:');
     expect(output).toContain('Test Patent');
@@ -112,7 +110,11 @@ describe('search command', () => {
   });
 
   it('outputs JSON with json flag', async () => {
-    await handler({ ...defaultArgs, query: 'test', json: true });
+    await handler({
+      ...defaultCtx,
+      parameters: { query: 'test' },
+      flags: { ...defaultCtx.flags, json: true },
+    });
     const output = JSON.parse(stdoutOutput.join('')) as unknown[];
     expect(Array.isArray(output)).toBe(true);
     expect(output).toHaveLength(1);
@@ -120,11 +122,9 @@ describe('search command', () => {
 
   it('passes filter options to searchPatents', async () => {
     await handler({
-      ...defaultArgs,
-      query: 'test',
-      num: 5,
-      sort: 'new',
-      assignee: 'Google',
+      ...defaultCtx,
+      parameters: { query: 'test' },
+      flags: { ...defaultCtx.flags, num: 5, sort: 'new', assignee: 'Google' },
     });
     expect(mockSearchPatents).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -138,13 +138,16 @@ describe('search command', () => {
 
   it('handles empty results', async () => {
     mockSearchPatents.mockResolvedValue({ organic_results: [] });
-    await handler({ ...defaultArgs, query: 'nothing' });
+    await handler({ ...defaultCtx, parameters: { query: 'nothing' } });
     const output = stdoutOutput.join('');
     expect(output).toContain('0 result(s)');
   });
 
   it('searches without query using filters only', async () => {
-    await handler({ ...defaultArgs, assignee: 'Samsung', status: 'GRANT' });
+    await handler({
+      ...defaultCtx,
+      flags: { ...defaultCtx.flags, assignee: 'Samsung', status: 'GRANT' },
+    });
     expect(mockSearchPatents).toHaveBeenCalledWith(
       expect.objectContaining({
         assignee: 'Samsung',

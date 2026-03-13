@@ -1,80 +1,31 @@
-import { command, flag, option, positional, optional, string, number } from 'cmd-ts';
+import { defineCommand } from 'clerc';
 import { getConfig } from '../../config.js';
 import { createLogger } from '../../logger.js';
 import { SerpApiClient } from '../../services/serpapi.js';
 import type { SearchPatentsArgs } from '../../types.js';
 import { formatSearchResults } from '../format.js';
 
-export const search = command({
-  name: 'search',
-  description: 'Search Google Patents',
-  args: {
-    query: positional({
-      type: optional(string),
-      displayName: 'query',
-      description: 'Search query',
-    }),
-    json: flag({ long: 'json', description: 'Output as JSON' }),
-    page: option({
-      type: optional(number),
-      long: 'page',
-      short: 'p',
-      description: 'Page number',
-    }),
-    num: option({
-      type: optional(number),
-      long: 'num',
-      short: 'n',
-      description: 'Number of results',
-    }),
-    sort: option({
-      type: optional(string),
-      long: 'sort',
-      description: 'Sort order (new/old)',
-    }),
-    before: option({
-      type: optional(string),
-      long: 'before',
-      description: 'Before date',
-    }),
-    after: option({
-      type: optional(string),
-      long: 'after',
-      description: 'After date',
-    }),
-    inventor: option({
-      type: optional(string),
-      long: 'inventor',
-      description: 'Inventor name',
-    }),
-    assignee: option({
-      type: optional(string),
-      long: 'assignee',
-      description: 'Assignee name',
-    }),
-    country: option({
-      type: optional(string),
-      long: 'country',
-      description: 'Country code',
-    }),
-    language: option({
-      type: optional(string),
-      long: 'language',
-      description: 'Language code',
-    }),
-    status: option({
-      type: optional(string),
-      long: 'status',
-      description: 'Patent status (GRANT/APPLICATION)',
-    }),
-    type: option({
-      type: optional(string),
-      long: 'type',
-      description: 'Patent type (PATENT/DESIGN)',
-    }),
-    scholar: flag({ long: 'scholar', description: 'Include Google Scholar results' }),
+export const search = defineCommand(
+  {
+    name: 'search',
+    description: 'Search Google Patents',
+    parameters: ['[query]'] as const,
+    flags: {
+      page: { type: Number, description: 'Page number', short: 'p' },
+      num: { type: Number, description: 'Number of results', short: 'n' },
+      sort: { type: String, description: 'Sort order (new/old)' },
+      before: { type: String, description: 'Before date' },
+      after: { type: String, description: 'After date' },
+      inventor: { type: String, description: 'Inventor name' },
+      assignee: { type: String, description: 'Assignee name' },
+      country: { type: String, description: 'Country code' },
+      language: { type: String, description: 'Language code' },
+      status: { type: String, description: 'Patent status (GRANT/APPLICATION)' },
+      type: { type: String, description: 'Patent type (PATENT/DESIGN)' },
+      scholar: { type: Boolean, description: 'Include Google Scholar results' },
+    },
   },
-  handler: async (args) => {
+  async (ctx) => {
     const config = getConfig();
     const logger = createLogger('error');
     const serpApiClient = new SerpApiClient(
@@ -85,27 +36,27 @@ export const search = command({
     );
 
     const searchArgs: SearchPatentsArgs = {};
-    if (args.query) searchArgs.q = args.query;
-    if (args.page !== undefined) searchArgs.page = args.page;
-    if (args.num !== undefined) searchArgs.num = args.num;
-    if (args.sort) searchArgs.sort = args.sort as 'new' | 'old';
-    if (args.before) searchArgs.before = args.before;
-    if (args.after) searchArgs.after = args.after;
-    if (args.inventor) searchArgs.inventor = args.inventor;
-    if (args.assignee) searchArgs.assignee = args.assignee;
-    if (args.country) searchArgs.country = args.country;
-    if (args.language) searchArgs.language = args.language;
-    if (args.status) searchArgs.status = args.status as 'GRANT' | 'APPLICATION';
-    if (args.type) searchArgs.type = args.type as 'PATENT' | 'DESIGN';
-    if (args.scholar) searchArgs.scholar = true;
+    if (ctx.parameters.query) searchArgs.q = ctx.parameters.query;
+    if (ctx.flags.page !== undefined) searchArgs.page = ctx.flags.page;
+    if (ctx.flags.num !== undefined) searchArgs.num = ctx.flags.num;
+    if (ctx.flags.sort) searchArgs.sort = ctx.flags.sort as 'new' | 'old';
+    if (ctx.flags.before) searchArgs.before = ctx.flags.before;
+    if (ctx.flags.after) searchArgs.after = ctx.flags.after;
+    if (ctx.flags.inventor) searchArgs.inventor = ctx.flags.inventor;
+    if (ctx.flags.assignee) searchArgs.assignee = ctx.flags.assignee;
+    if (ctx.flags.country) searchArgs.country = ctx.flags.country;
+    if (ctx.flags.language) searchArgs.language = ctx.flags.language;
+    if (ctx.flags.status) searchArgs.status = ctx.flags.status as 'GRANT' | 'APPLICATION';
+    if (ctx.flags.type) searchArgs.type = ctx.flags.type as 'PATENT' | 'DESIGN';
+    if (ctx.flags.scholar) searchArgs.scholar = true;
 
     const response = await serpApiClient.searchPatents(searchArgs);
     const results = response.organic_results ?? [];
 
-    if (args.json) {
+    if (ctx.flags.json) {
       process.stdout.write(JSON.stringify(results, null, 2) + '\n');
     } else {
       process.stdout.write(formatSearchResults(results) + '\n');
     }
-  },
-});
+  }
+);
