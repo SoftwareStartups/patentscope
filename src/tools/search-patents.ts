@@ -1,5 +1,5 @@
 import type { CallToolResult, Tool } from '@modelcontextprotocol/sdk/types.js';
-import type winston from 'winston';
+import type { Logger } from '../logger.js';
 import type { SerpApiClient } from '../services/serpapi.js';
 import type { SearchPatentsArgs, ToolDefinition } from '../types.js';
 
@@ -86,7 +86,7 @@ export const searchPatentsToolDefinition: Tool = {
 
 export function createSearchPatentsTool(
   serpApiClient: SerpApiClient,
-  logger: winston.Logger
+  logger: Logger
 ): ToolDefinition {
   return {
     definition: searchPatentsToolDefinition,

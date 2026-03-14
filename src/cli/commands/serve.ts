@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import { defineCommand } from 'clerc';
 import { getConfig } from '../../config.js';
 import { createLogger } from '../../logger.js';
@@ -9,38 +8,7 @@ import {
   createGetPatentTool,
   createSearchPatentsTool,
 } from '../../tools/index.js';
-
-const packageJson = JSON.parse(
-  readFileSync(new URL('../../../package.json', import.meta.url), 'utf-8')
-) as { version: string };
-
-function setupProcessHandlers(logger: ReturnType<typeof createLogger>): void {
-  const flushLogs = () => {
-    logger.debug('Flushing logs on process exit');
-    try {
-      logger.close();
-    } catch {
-      // Ignore errors during shutdown
-    }
-  };
-
-  process.on('exit', flushLogs);
-
-  process.on('SIGINT', () => {
-    logger.info('Received SIGINT. Shutting down.');
-    flushLogs();
-    process.exit(0);
-  });
-
-  process.on('uncaughtException', (err) => {
-    logger.error(`Uncaught exception: ${err.message}`);
-    if (err.stack) {
-      logger.error(err.stack);
-    }
-    flushLogs();
-    process.exit(1);
-  });
-}
+import packageJson from '../../../package.json' with { type: 'json' };
 
 export const serve = defineCommand(
   { name: 'serve', description: 'Start the MCP server on stdio' },
@@ -51,7 +19,16 @@ export const serve = defineCommand(
     logger.info('=== PatentScope Server started ===');
     logger.info('SERPAPI_API_KEY found.');
 
-    setupProcessHandlers(logger);
+    process.on('SIGINT', () => {
+      logger.info('Received SIGINT. Shutting down.');
+      process.exit(0);
+    });
+
+    process.on('uncaughtException', (err) => {
+      logger.error(`Uncaught exception: ${err.message}`);
+      if (err.stack) logger.error(err.stack);
+      process.exit(1);
+    });
 
     const serpApiClient = new SerpApiClient(
       config.serpApiKey,

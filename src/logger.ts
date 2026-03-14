@@ -1,21 +1,34 @@
-import winston from 'winston';
+type LogLevel = 'error' | 'warn' | 'info' | 'debug';
 
-export const createLogger = (logLevel: string): winston.Logger => {
-  const logFormat = winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.printf((info) => {
-      return `[${String(info.timestamp)}] [${String(info.level)}] ${String(info.message)}`;
-    })
-  );
+const PRIORITY: Record<LogLevel, number> = {
+  error: 0,
+  warn: 1,
+  info: 2,
+  debug: 3,
+};
 
-  return winston.createLogger({
-    level: logLevel,
-    format: logFormat,
-    transports: [
-      new winston.transports.Console({
-        level: logLevel,
-        stderrLevels: ['error', 'warn', 'info', 'debug'],
-      }),
-    ],
-  });
+export interface Logger {
+  error(message: string): void;
+  warn(message: string): void;
+  info(message: string): void;
+  debug(message: string): void;
+}
+
+export const createLogger = (logLevel: string): Logger => {
+  const maxPriority = PRIORITY[(logLevel as LogLevel)] ?? PRIORITY.info;
+
+  const log = (level: LogLevel, message: string): void => {
+    if (PRIORITY[level] <= maxPriority) {
+      process.stderr.write(
+        `[${new Date().toISOString()}] [${level}] ${message}\n`
+      );
+    }
+  };
+
+  return {
+    error: (msg) => log('error', msg),
+    warn: (msg) => log('warn', msg),
+    info: (msg) => log('info', msg),
+    debug: (msg) => log('debug', msg),
+  };
 };

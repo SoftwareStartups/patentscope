@@ -1,4 +1,4 @@
-import type winston from 'winston';
+import type { Logger } from '../logger.js';
 import type {
   FetchPatentOptions,
   PatentData,
@@ -14,10 +14,10 @@ import {
 import { resolvePatentId } from '../utils/patent-id-resolver.js';
 
 export class PatentService {
-  private readonly logger: winston.Logger;
+  private readonly logger: Logger;
   private readonly serpApiClient: SerpApiClient;
 
-  constructor(serpApiClient: SerpApiClient, logger: winston.Logger) {
+  constructor(serpApiClient: SerpApiClient, logger: Logger) {
     this.serpApiClient = serpApiClient;
     this.logger = logger;
   }

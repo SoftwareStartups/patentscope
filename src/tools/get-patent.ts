@@ -4,7 +4,7 @@ import {
   McpError,
   type Tool,
 } from '@modelcontextprotocol/sdk/types.js';
-import type winston from 'winston';
+import type { Logger } from '../logger.js';
 import type { PatentService } from '../services/patent.js';
 import type {
   FetchPatentOptions,
@@ -86,7 +86,7 @@ function validateIncludeValues(include: string[]): void {
 
 export function createGetPatentTool(
   patentService: PatentService,
-  logger: winston.Logger
+  logger: Logger
 ): ToolDefinition {
   return {
     definition: getPatentToolDefinition,

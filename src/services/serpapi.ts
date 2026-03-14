@@ -1,4 +1,4 @@
-import type winston from 'winston';
+import type { Logger } from '../logger.js';
 import type {
   SearchPatentsArgs,
   SerpApiPatentDetailsResponse,
@@ -7,13 +7,13 @@ import type {
 
 export class SerpApiClient {
   private readonly apiKey: string;
-  private readonly logger: winston.Logger;
+  private readonly logger: Logger;
   private readonly timeoutMs: number;
   private readonly baseUrl: string;
 
   constructor(
     apiKey: string,
-    logger: winston.Logger,
+    logger: Logger,
     timeoutMs = 30000,
     baseUrl = 'https://serpapi.com'
   ) {

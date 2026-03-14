@@ -8,17 +8,17 @@ import {
   ListToolsRequestSchema,
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
-import type winston from 'winston';
+import type { Logger } from './logger.js';
 import type { ToolDefinition } from './tools/index.js';
 
 export class PatentScopeServer {
   private readonly server: Server;
-  private readonly logger: winston.Logger;
+  private readonly logger: Logger;
   private readonly tools: Map<string, ToolDefinition>;
 
   constructor(
     version: string,
-    logger: winston.Logger,
+    logger: Logger,
     tools: ToolDefinition[]
   ) {
     this.logger = logger;
@@ -85,7 +85,7 @@ export class PatentScopeServer {
 
   private setupErrorHandlers(): void {
     this.server.onerror = (error: Error) => {
-      this.logger.error('[MCP Error]', error);
+      this.logger.error(`[MCP Error] ${error instanceof Error ? error.message : String(error)}`);
       this.logger.debug(
         `MCP server error details: ${error instanceof Error ? error.stack : JSON.stringify(error)}`
       );
