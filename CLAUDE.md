@@ -1,6 +1,6 @@
 # Project Overview
 
-MCP server exposing Google Patents search and retrieval via SerpApi. Two tools: `search_patents` and `get_patent`. Requires `SERPAPI_KEY` env var.
+MCP server exposing Google Patents search and retrieval via SerpApi. Two tools: `search_patents` and `get_patent`. Requires `SERPAPI_API_KEY` env var.
 
 ## Key Files & Directories
 
@@ -15,7 +15,7 @@ src/
       search.ts     # Patent search command
       get.ts        # Patent details command
   server.ts         # Tool registration
-  config.ts         # Env config (SERPAPI_KEY)
+  config.ts         # Env config (SERPAPI_API_KEY)
   types.ts          # Shared TypeScript types
   services/
     serpapi.ts      # SerpApi HTTP client
@@ -72,7 +72,7 @@ Technical standards and practices for code quality.
 
 ## TypeScript Best Practices
 
-- Use latest stable Node.js and TypeScript syntax
+- Use latest stable Bun and TypeScript syntax
 - Ensure all code is correctly typed (no `any` types unless absolutely necessary)
 - Prefer functional style over classes
 - Follow clean code principles: DRY, SOLID, meaningful names, small functions

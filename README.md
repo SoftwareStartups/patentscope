@@ -50,7 +50,9 @@ The server will start and listen for MCP requests on standard input/output.
 Usage: patentscope <command> [flags]
 
 Commands:
-  serve    Start the MCP server on stdio
+  serve              Start the MCP server on stdio
+  search [query]     Search Google Patents
+  get <patentId>     Get patent details
 
 Flags:
   -h, --help      Show this help message
@@ -69,7 +71,7 @@ Combine `--json` with `--version` or `--help` to get structured output on stdout
 ```bash
 # Version info as JSON
 bunx @softwarestartups/patentscope --version --json
-# → {"name":"@softwarestartups/patentscope","version":"1.0.0"}
+# → {"name":"@softwarestartups/patentscope","version":"x.x.x"}
 
 # Help as JSON
 bunx @softwarestartups/patentscope --help --json
@@ -504,6 +506,4 @@ The end-to-end tests validate that the server can successfully:
 * Log level can be controlled via the `LOG_LEVEL` environment variable
   (`error`, `warn`, `info`, `http`, `verbose`, `debug`, `silly`).
   Defaults to `info`.
-* A log file is attempted to be created in the project root
-  (`google-patents-server.log`), user's home directory
-  (`~/.google-patents-server.log`), or `/tmp/google-patents-server.log`.
+* All log output goes exclusively to standard error — no log file is created.
