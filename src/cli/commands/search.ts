@@ -58,9 +58,9 @@ export const search = defineCommand(
     const results = response.organic_results ?? [];
 
     if (ctx.flags.json) {
-      process.stdout.write(JSON.stringify(results, null, 2) + '\n');
+      process.stdout.write(`${JSON.stringify(results, null, 2)}\n`);
     } else {
-      process.stdout.write(formatSearchResults(results) + '\n');
+      process.stdout.write(`${formatSearchResults(results)}\n`);
     }
   }
 );

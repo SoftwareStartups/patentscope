@@ -6,8 +6,8 @@
 
 import { describe, expect, it, mock } from 'bun:test';
 import winston from 'winston';
-import { PatentService } from '../../../src/services/patent.js';
-import { SerpApiClient } from '../../../src/services/serpapi.js';
+import type { PatentService } from '../../../src/services/patent.js';
+import type { SerpApiClient } from '../../../src/services/serpapi.js';
 import { createGetPatentTool } from '../../../src/tools/get-patent.js';
 import { createSearchPatentsTool } from '../../../src/tools/search-patents.js';
 import type { PatentData, SerpApiResponse } from '../../../src/types.js';
@@ -406,7 +406,7 @@ describe('Tool Handlers', () => {
       const searchData = parseToolResponse<SerpApiResponse>(searchResponse);
       assertValidSearchResponse(searchData);
       expect(searchData.organic_results).toBeDefined();
-      expect(searchData.organic_results!.length).toBeGreaterThan(0);
+      expect(searchData.organic_results?.length).toBeGreaterThan(0);
 
       // Step 2: Get content for first patent
       const firstPatent = searchData.organic_results![0];

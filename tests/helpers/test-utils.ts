@@ -28,7 +28,6 @@ export function parseToolResponse<T = unknown>(response: CallToolResult): T {
     const parsed = JSON.parse(firstContent.text);
     // Type assertion is safe here because we validate the structure before parsing
     // and the generic T is provided by the caller based on expected structure
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return parsed as T;
   } catch {
     throw new Error('Response text is not valid JSON');

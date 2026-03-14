@@ -75,9 +75,9 @@ export const get = defineCommand(
     );
 
     if (ctx.flags.json) {
-      process.stdout.write(JSON.stringify(data, null, 2) + '\n');
+      process.stdout.write(`${JSON.stringify(data, null, 2)}\n`);
     } else {
-      process.stdout.write(formatPatentData(data) + '\n');
+      process.stdout.write(`${formatPatentData(data)}\n`);
     }
   }
 );

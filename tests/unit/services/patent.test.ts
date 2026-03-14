@@ -452,8 +452,8 @@ describe('PatentService', () => {
       });
 
       expect(result.claims).toBeDefined();
-      expect(result.claims!.length).toBeLessThanOrEqual(4);
-      expect(result.claims!.length).toBeGreaterThan(0);
+      expect(result.claims?.length).toBeLessThanOrEqual(4);
+      expect(result.claims?.length).toBeGreaterThan(0);
     });
 
     it('should not truncate when content is below max_length', async () => {

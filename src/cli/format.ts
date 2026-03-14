@@ -16,7 +16,7 @@ export function formatSearchResults(results: PatentResult[]): string {
     return lines.join('\n');
   });
 
-  return entries.join('\n---\n') + `\n\n${results.length} result(s)`;
+  return `${entries.join('\n---\n')}\n\n${results.length} result(s)`;
 }
 
 export function formatPatentData(data: PatentData): string {

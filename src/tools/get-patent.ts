@@ -1,10 +1,10 @@
 import {
+  type CallToolResult,
   ErrorCode,
   McpError,
-  type CallToolResult,
   type Tool,
 } from '@modelcontextprotocol/sdk/types.js';
-import winston from 'winston';
+import type winston from 'winston';
 import type { PatentService } from '../services/patent.js';
 import type {
   FetchPatentOptions,

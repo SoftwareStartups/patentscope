@@ -6,10 +6,10 @@
  * without API costs.
  */
 
+import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import type { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import type { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import type { PatentData, SerpApiResponse } from '../src/types.js';
 import {
   assertHasAbstract,
@@ -72,7 +72,7 @@ describe('Integration Tests - MCP Server with Mocked SerpAPI', () => {
       assertValidSearchResponse(data);
 
       expect(data.organic_results).toBeDefined();
-      expect(data.organic_results!.length).toBeGreaterThan(0);
+      expect(data.organic_results?.length).toBeGreaterThan(0);
 
       // Validate first result has mocked data
       const firstResult = data.organic_results![0];
@@ -251,7 +251,7 @@ describe('Integration Tests - MCP Server with Mocked SerpAPI', () => {
       assertValidSearchResponse(searchData);
 
       expect(searchData.organic_results).toBeDefined();
-      expect(searchData.organic_results!.length).toBeGreaterThan(0);
+      expect(searchData.organic_results?.length).toBeGreaterThan(0);
 
       // Step 2: Get content for first patent
       const firstPatent = searchData.organic_results![0];

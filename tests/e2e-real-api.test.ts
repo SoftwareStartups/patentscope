@@ -5,13 +5,11 @@
  * They can be skipped in CI by excluding the e2e test file.
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-
+import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import type { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import type { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import * as dotenv from 'dotenv';
-import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import type { PatentData, SerpApiResponse } from '../src/types.js';
 import {
   assertHasAbstract,
@@ -69,7 +67,7 @@ describe('E2E Tests - MCP Server with Real SerpAPI', () => {
       assertValidSearchResponse(data);
 
       expect(data.organic_results).toBeDefined();
-      expect(data.organic_results!.length).toBeGreaterThan(0);
+      expect(data.organic_results?.length).toBeGreaterThan(0);
 
       // Validate first result has real data
       const firstResult = data.organic_results![0];
@@ -245,7 +243,7 @@ describe('E2E Tests - MCP Server with Real SerpAPI', () => {
       assertValidSearchResponse(searchData);
 
       expect(searchData.organic_results).toBeDefined();
-      expect(searchData.organic_results!.length).toBeGreaterThan(0);
+      expect(searchData.organic_results?.length).toBeGreaterThan(0);
 
       // Step 2: Get content for first patent
       const firstPatent = searchData.organic_results![0];

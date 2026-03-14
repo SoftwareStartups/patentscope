@@ -5,9 +5,9 @@
  * to test the MCP server without making real API calls.
  */
 
+import { createServer, type Server } from 'node:http';
 import type { Application } from 'express';
 import express from 'express';
-import { createServer, type Server } from 'http';
 import { mockPatentDetailsResponse, mockSearchResponse } from './test-data.js';
 
 export class MockSerpApiServer {
@@ -42,7 +42,7 @@ export class MockSerpApiServer {
     });
 
     // Health check endpoint
-    this.app.get('/health', (req, res) => {
+    this.app.get('/health', (_req, res) => {
       res.json({ status: 'ok' });
     });
   }

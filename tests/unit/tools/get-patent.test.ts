@@ -1,5 +1,5 @@
-import { ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import { describe, expect, it, mock } from 'bun:test';
+import { ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import { createGetPatentTool } from '../../../src/tools/get-patent.js';
 
 describe('get_patent Tool', () => {
@@ -72,7 +72,7 @@ describe('get_patent Tool', () => {
     );
     expect(result.content).toHaveLength(1);
     expect(result.content[0].type).toBe('text');
-    const text = result.content[0].text as string;
+    const text = (result.content[0] as { type: 'text'; text: string }).text;
     expect(JSON.parse(text)).toEqual(mockPatentData);
   });
 
@@ -117,7 +117,7 @@ describe('get_patent Tool', () => {
       }
     );
     expect(result.content[0].type).toBe('text');
-    const text = result.content[0].text as string;
+    const text = (result.content[0] as { type: 'text'; text: string }).text;
     expect(JSON.parse(text)).toEqual(mockPatentData);
   });
 
@@ -298,7 +298,7 @@ describe('get_patent Tool', () => {
       }
     );
 
-    const text = result.content[0].text as string;
+    const text = (result.content[0] as { type: 'text'; text: string }).text;
     const parsedData = JSON.parse(text) as {
       description?: string;
       patent_id?: string;

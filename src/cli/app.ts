@@ -1,5 +1,5 @@
+import { readFileSync } from 'node:fs';
 import { Cli } from 'clerc';
-import { readFileSync } from 'fs';
 import { get } from './commands/get.js';
 import { search } from './commands/search.js';
 import { serve } from './commands/serve.js';

@@ -1,5 +1,5 @@
+import { readFileSync } from 'node:fs';
 import { defineCommand } from 'clerc';
-import { readFileSync } from 'fs';
 import { getConfig } from '../../config.js';
 import { createLogger } from '../../logger.js';
 import { PatentScopeServer } from '../../server.js';

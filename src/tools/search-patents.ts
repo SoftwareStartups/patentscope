@@ -1,5 +1,5 @@
 import type { CallToolResult, Tool } from '@modelcontextprotocol/sdk/types.js';
-import winston from 'winston';
+import type winston from 'winston';
 import type { SerpApiClient } from '../services/serpapi.js';
 import type { SearchPatentsArgs, ToolDefinition } from '../types.js';
 

@@ -102,7 +102,7 @@ describe('search_patents Tool', () => {
     expect(mockSerpApiClient.searchPatents).toHaveBeenCalledWith(args);
     expect(result.content).toHaveLength(1);
     expect(result.content[0].type).toBe('text');
-    const text = result.content[0].text as string;
+    const text = (result.content[0] as { type: 'text'; text: string }).text;
     expect(JSON.parse(text)).toEqual(mockResponse);
   });
 
@@ -164,6 +164,8 @@ describe('search_patents Tool', () => {
     const result = await tool.handler(args);
 
     expect(mockSerpApiClient.searchPatents).toHaveBeenCalledWith(args);
-    expect(result.content[0].text).toContain('Skyfora Oy');
+    expect(
+      (result.content[0] as { type: 'text'; text: string }).text
+    ).toContain('Skyfora Oy');
   });
 });

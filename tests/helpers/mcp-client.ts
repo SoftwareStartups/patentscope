@@ -2,11 +2,11 @@
  * Helper utilities for creating and managing MCP test clients
  */
 
+import * as path from 'node:path';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import * as path from 'path';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -25,9 +25,7 @@ export async function createMcpTestClient(): Promise<McpTestClient> {
       version: '1.0.0',
     },
     {
-      capabilities: {
-        tools: {},
-      },
+      capabilities: {},
     }
   );
 
@@ -54,7 +52,7 @@ export async function closeMcpTestClient(
 ): Promise<void> {
   try {
     await testClient.client.close();
-  } catch (error) {
+  } catch {
     // Ignore errors during cleanup
   }
 }

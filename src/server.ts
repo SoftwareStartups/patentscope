@@ -8,7 +8,7 @@ import {
   ListToolsRequestSchema,
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
-import winston from 'winston';
+import type winston from 'winston';
 import type { ToolDefinition } from './tools/index.js';
 
 export class PatentScopeServer {
