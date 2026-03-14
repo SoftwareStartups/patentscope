@@ -1,13 +1,9 @@
-import { readFileSync } from 'node:fs';
 import { Cli } from 'clerc';
+import packageJson from '../../package.json' with { type: 'json' };
 import { get } from './commands/get.js';
 import { search } from './commands/search.js';
 import { serve } from './commands/serve.js';
 import { jsonOutputPlugin } from './plugins/json-output.js';
-
-const packageJson = JSON.parse(
-  readFileSync(new URL('../../package.json', import.meta.url), 'utf-8')
-) as { version: string };
 
 function resolveArgv(argv: string[]): string[] {
   if (argv.length === 0) return ['--help'];
