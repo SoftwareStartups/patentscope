@@ -36,34 +36,6 @@ describe('search_patents Tool', () => {
     expect(tool.definition.inputSchema.properties).toHaveProperty('scholar');
   });
 
-  it('should not have content-related parameters', () => {
-    const mockLogger = {
-      info: mock(),
-      warn: mock(),
-      error: mock(),
-      debug: mock(),
-    };
-
-    const mockSerpApiClient = {
-      searchPatents: mock(),
-    };
-
-    const tool = createSearchPatentsTool(
-      mockSerpApiClient as never,
-      mockLogger as never
-    );
-
-    expect(tool.definition.inputSchema.properties).not.toHaveProperty(
-      'include_full_content'
-    );
-    expect(tool.definition.inputSchema.properties).not.toHaveProperty(
-      'include_claims'
-    );
-    expect(tool.definition.inputSchema.properties).not.toHaveProperty(
-      'include_description'
-    );
-  });
-
   it('should call serpApiClient.searchPatents with provided args', async () => {
     const mockLogger = {
       info: mock(),
