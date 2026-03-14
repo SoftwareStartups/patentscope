@@ -43,7 +43,7 @@ export const get = defineCommand(
   },
   async (ctx) => {
     const config = getConfig();
-    const logger = createLogger('error');
+    const logger = createLogger(config.logLevel);
     const serpApiClient = new SerpApiClient(
       config.serpApiKey,
       logger,
