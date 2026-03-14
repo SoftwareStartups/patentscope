@@ -16,11 +16,7 @@ export class PatentScopeServer {
   private readonly logger: Logger;
   private readonly tools: Map<string, ToolDefinition>;
 
-  constructor(
-    version: string,
-    logger: Logger,
-    tools: ToolDefinition[]
-  ) {
+  constructor(version: string, logger: Logger, tools: ToolDefinition[]) {
     this.logger = logger;
     this.tools = new Map(tools.map((tool) => [tool.definition.name, tool]));
 
@@ -85,7 +81,9 @@ export class PatentScopeServer {
 
   private setupErrorHandlers(): void {
     this.server.onerror = (error: Error) => {
-      this.logger.error(`[MCP Error] ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `[MCP Error] ${error instanceof Error ? error.message : String(error)}`
+      );
       this.logger.debug(
         `MCP server error details: ${error instanceof Error ? error.stack : JSON.stringify(error)}`
       );

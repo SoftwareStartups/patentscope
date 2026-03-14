@@ -15,7 +15,7 @@ export interface Logger {
 }
 
 export const createLogger = (logLevel: string): Logger => {
-  const maxPriority = PRIORITY[(logLevel as LogLevel)] ?? PRIORITY.info;
+  const maxPriority = PRIORITY[logLevel as LogLevel] ?? PRIORITY.info;
 
   const log = (level: LogLevel, message: string): void => {
     if (PRIORITY[level] <= maxPriority) {
