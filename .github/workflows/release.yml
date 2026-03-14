@@ -23,7 +23,7 @@ jobs:
             target: bun-linux-arm64
             os: linux
             arch: arm64
-          - runner: macos-13
+          - runner: ubuntu-latest
             target: bun-darwin-x64
             os: darwin
             arch: x64
