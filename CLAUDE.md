@@ -28,7 +28,7 @@ src/
     patent-id-resolver.ts  # Normalise patent IDs (EP, US, WO…)
     content-truncator.ts
 tests/
-  unit/             # Vitest unit tests
+  unit/             # Bun test unit tests
   integration-mocked-api.test.ts  # Full MCP flow with mock SerpApi
   e2e-real-api.test.ts            # Real SerpApi (needs key)
   helpers/          # Shared test utilities
@@ -99,6 +99,7 @@ This project runs exclusively on Bun. Never use Node.js polyfills or Node-specif
 ## Build Verification
 
 - After each major code change (not markdown documents), run:
+  - `task format` - to format code
   - `task check` - to verify code quality and types
   - `task test` - to ensure all tests pass
 
@@ -111,8 +112,6 @@ This project runs exclusively on Bun. Never use Node.js polyfills or Node-specif
 # Release Process
 
 - Releases are triggered by pushing a semver tag (`v*`) to the repository
-- CI must pass before tagging — the release workflow does not run CI itself
-- The `release.yml` workflow cross-compiles 4 Bun binaries (Linux/macOS × x64/arm64) and publishes them to GitHub Releases
 - Use `task compile` to build a binary for the current platform locally
 - Use `task compile:all` to build all 4 platform binaries locally
 
