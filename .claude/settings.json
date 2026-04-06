@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__exa__web_search_advanced_exa",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "WebSearch",
+      "WebFetch",
+      "Skill(commit-commands:commit)",
+      "Bash(task --list:*)",
+      "Bash(task lint:*)",
+      "Bash(task format:*)",
+      "Bash(task check:*)",
+      "Bash(task test:*)",
+      "Bash(task ci:*)",
+      "Bash(bun test:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "case \"$CLAUDE_TOOL_INPUT_FILE_PATH\" in *.ts) cd /Volumes/work/softwarestartups/evercli && bunx biome format --write \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null && bunx tsc --noEmit 2>&1 | head -20 ;; esac",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
