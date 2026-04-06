@@ -1,6 +1,6 @@
 # Patentscope
 
-MCP server exposing Google Patents search and retrieval via SerpApi. Two tools: `search_patents` and `get_patent`. Requires `SERPAPI_API_KEY` env var.
+CLI for searching and retrieving Google Patents via SerpApi. Three commands: `search`, `get`, `serve` (MCP server). Requires `SERPAPI_API_KEY` env var.
 
 ## Key Files & Directories
 

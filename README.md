@@ -1,48 +1,30 @@
-# Google Patents MCP Server (`patentscope`)
+# patentscope
 
-[![smithery badge](https://smithery.ai/badge/@SoftwareStartups/patentscope)](https://smithery.ai/server/@SoftwareStartups/patentscope)
-[![npm version](https://badge.fury.io/js/%40softwarestartups%2Fpatentscope.svg)](https://badge.fury.io/js/%40softwarestartups%2Fpatentscope)
-
-This project provides a Model Context Protocol (MCP) server that allows
-searching Google Patents information via the
+CLI for searching and retrieving Google Patents data via the
 [SerpApi Google Patents API](https://serpapi.com/google-patents-api).
+Also works as an [MCP](https://modelcontextprotocol.io/) server for AI-assisted patent research.
 
 ## Credits
 
 This project is a fork of the original [google-patents-mcp](https://github.com/KunihiroS/google-patents-mcp) by [Kunihiro Sasayama](https://github.com/KunihiroS). We extend our gratitude for the foundational work and inspiration.
 
-## Installing via Smithery
-
-To install Google Patents MCP Server for Claude Desktop automatically via
-[Smithery](https://smithery.ai/server/@SoftwareStartups/patentscope):
+## Quick Start
 
 ```bash
-bunx @smithery/cli install @SoftwareStartups/patentscope --client claude
+# Install
+bun add -g @softwarestartups/patentscope
+
+# Or run without installing
+bunx @softwarestartups/patentscope search "quantum computing"
 ```
 
-## Features
-
-* Provides two focused MCP tools for patent research:
-  * `search_patents` - Fast metadata search via SerpApi
-  * `get_patent` - Comprehensive patent data retrieval (claims, description, family members, citations, metadata)
-* Uses SerpApi for both search and detailed patent information via structured endpoints.
-* Can be run via `bunx` without local installation, or using a pre-built binary with no runtime required.
+Pre-built binaries (no runtime required) are available on the
+[GitHub Releases](https://github.com/SoftwareStartups/patentscope/releases) page.
 
 ## Prerequisites
 
-* **Bun:** Version 1.0 or higher is recommended.
-* **SerpApi API Key:** You need a valid API key from
-  [SerpApi](https://serpapi.com/) to use the Google Patents API.
-
-## Quick Start
-
-The easiest way to run this server is using `bunx`:
-
-```bash
-bunx @softwarestartups/patentscope serve
-```
-
-The server will start and listen for MCP requests on standard input/output.
+* **Bun:** Version 1.0 or higher (not needed when using a pre-built binary).
+* **SerpApi API Key:** A valid key from [SerpApi](https://serpapi.com/).
 
 ## CLI Usage
 
@@ -50,309 +32,190 @@ The server will start and listen for MCP requests on standard input/output.
 Usage: patentscope <command> [flags]
 
 Commands:
-  serve              Start the MCP server on stdio
   search [query]     Search Google Patents
   get <patentId>     Get patent details
+  serve              Start the MCP server on stdio
 
 Flags:
   -h, --help      Show this help message
   -v, --version   Show version information
-      --json      Output as JSON (use with --help or --version)
+      --json      Output as JSON
 ```
 
-The `serve` command is required — bare invocation without a command prints help and exits with an error.
+All human-readable output goes to **stderr**. Stdout is reserved for `--json` structured output and the MCP JSON-RPC transport (in `serve` mode).
 
-All human-readable output goes to **stderr**. Stdout is reserved for the MCP JSON-RPC transport and for `--json` structured output.
+### Searching patents
+
+```bash
+# Basic search
+patentscope search "neural network chip"
+
+# With filters
+patentscope search "battery" --status GRANT --country US --num 20
+
+# Date range
+patentscope search "CRISPR" --after publication:20230101 --before publication:20231231
+
+# Filter by inventor or assignee
+patentscope search --inventor "John Smith" --assignee "Google"
+
+# JSON output
+patentscope search "quantum computing" --json
+```
+
+**Search flags:**
+
+| Flag           | Description                                |
+|----------------|--------------------------------------------|
+| `-p, --page`   | Page number (default: 1)                  |
+| `-n, --num`    | Results per page (10-100, default: 10)    |
+| `--sort`       | Sort by `new` or `old`                    |
+| `--before`     | Max date (e.g. `publication:20231231`)    |
+| `--after`      | Min date (e.g. `publication:20230101`)    |
+| `--inventor`   | Filter by inventor                        |
+| `--assignee`   | Filter by assignee                        |
+| `--country`    | Country code (e.g. `US`, `WO,JP`)        |
+| `--language`   | Language (e.g. `ENGLISH`, `JAPANESE`)     |
+| `--status`     | `GRANT` or `APPLICATION`                  |
+| `--type`       | `PATENT` or `DESIGN`                      |
+| `--scholar`    | Include Google Scholar results            |
+
+### Retrieving patent details
+
+```bash
+# Get metadata and abstract (default)
+patentscope get US7654321B2
+
+# Get specific sections
+patentscope get US7654321B2 --include claims,description
+
+# Get everything
+patentscope get EP3456789A1 --include metadata,abstract,claims,description,family_members,citations
+
+# Limit content length
+patentscope get US7654321B2 --include description,claims --maxLength 5000
+
+# JSON output
+patentscope get US7654321B2 --json
+```
+
+**Get flags:**
+
+| Flag              | Description                                                      |
+|-------------------|------------------------------------------------------------------|
+| `-i, --include`   | Comma-separated sections: `metadata`, `abstract`, `claims`, `description`, `family_members`, `citations` (default: `metadata,abstract`) |
+| `--maxLength`     | Maximum character length for returned content                    |
 
 ### JSON output mode
 
-Combine `--json` with `--version` or `--help` to get structured output on stdout, suitable for programmatic consumption:
+Add `--json` to any command for structured output on stdout:
 
 ```bash
-# Version info as JSON
-bunx @softwarestartups/patentscope --version --json
-# → {"name":"@softwarestartups/patentscope","version":"x.x.x"}
-
-# Help as JSON
-bunx @softwarestartups/patentscope --help --json
-# → {"commands":[...],"flags":[...]}
+patentscope search "quantum computing" --json
+patentscope get US7654321B2 --json
+patentscope --version --json
+patentscope --help --json
 ```
 
 ## Configuration
 
-The server requires your SerpApi API key. You can provide it in one of the
-following ways:
+The SerpApi API key can be provided via:
 
-1. **Environment Variable (Recommended for MCP Hosts):**
-   Set the `SERPAPI_API_KEY` environment variable when running the server.
+1. **Environment variable (recommended):**
 
-   Example MCP Host configuration snippet (`config.json` or similar):
-
-   Using a pre-built binary (no runtime required — download from [GitHub Releases](https://github.com/SoftwareStartups/patentscope/releases)):
-
-   ```json
-   {
-     "mcpServers": {
-       "patentscope": {
-         "command": "/path/to/patentscope-darwin-arm64",
-         "args": ["serve"],
-         "env": {
-           "SERPAPI_API_KEY": "YOUR_ACTUAL_SERPAPI_KEY"
-         }
-       }
-     }
-   }
+   ```bash
+   export SERPAPI_API_KEY=your_key
+   patentscope search "quantum computing"
    ```
 
-   Or using `bunx`:
-
-   ```json
-   {
-     "mcpServers": {
-       "patentscope": {
-         "command": "bunx",
-         "args": [
-           "@softwarestartups/patentscope",
-           "serve"
-         ],
-         "env": {
-           "SERPAPI_API_KEY": "YOUR_ACTUAL_SERPAPI_KEY"
-         }
-       }
-     }
-   }
-   ```
-
-2. **.env File:**
-   Create a `.env` file in the directory where you run the command
-   (for local testing or if not using an MCP Host), or in your home directory
-   (`~/.patentscope.env`), with the following content:
+2. **.env file** in the working directory or `~/.patentscope.env`:
 
    ```dotenv
-   SERPAPI_API_KEY=YOUR_ACTUAL_SERPAPI_KEY
-   # Optional: Set log level (e.g., debug, info, warn, error)
+   SERPAPI_API_KEY=your_key
    # LOG_LEVEL=debug
    ```
 
-   The server searches for `.env` files in the following order:
+   Lookup order: `./.env` then `~/.patentscope.env`.
 
-   * `./.env` (relative to where the command is run)
-   * `~/.patentscope.env` (in your home directory)
+## MCP Server
 
-## OpenClaw Configuration
+The `serve` command starts an MCP server on stdio, exposing two tools:
+`search_patents` and `get_patent`.
 
-To use with [OpenClaw](https://openclaw.dev/), add the following to your OpenClaw MCP server config:
+### MCP Host Configuration
+
+Using a pre-built binary (download from [GitHub Releases](https://github.com/SoftwareStartups/patentscope/releases)):
 
 ```json
 {
   "mcpServers": {
     "patentscope": {
-      "command": "bunx",
-      "args": [
-        "@softwarestartups/patentscope",
-        "serve"
-      ],
+      "command": "/path/to/patentscope-darwin-arm64",
+      "args": ["serve"],
       "env": {
-        "SERPAPI_API_KEY": "YOUR_ACTUAL_SERPAPI_KEY"
+        "SERPAPI_API_KEY": "YOUR_SERPAPI_KEY"
       }
     }
   }
 }
 ```
 
-## Provided MCP Tools
+Using `bunx`:
 
-### `search_patents`
+```json
+{
+  "mcpServers": {
+    "patentscope": {
+      "command": "bunx",
+      "args": ["@softwarestartups/patentscope", "serve"],
+      "env": {
+        "SERPAPI_API_KEY": "YOUR_SERPAPI_KEY"
+      }
+    }
+  }
+}
+```
 
-Searches Google Patents via SerpApi. Returns patent metadata only (no full text).
+### MCP Tools
 
-**Parameters:**
+#### `search_patents`
+
+Searches Google Patents via SerpApi. Returns patent metadata (title, publication number, assignee, inventor, dates, and `patent_link`).
 
 | Parameter  | Type    | Required | Description                                           |
 |------------|---------|----------|-------------------------------------------------------|
-| `q`        | string  | No       | Search query. Use semicolon to separate terms        |
-| `page`     | integer | No       | Page number for pagination (default: 1)              |
+| `q`        | string  | No       | Search query (semicolon-separated terms)             |
+| `page`     | integer | No       | Page number (default: 1)                             |
 | `num`      | integer | No       | Results per page (10-100, default: 10)               |
-| `sort`     | string  | No       | Sort by: 'new' (newest by filing/publication date) or 'old' (oldest by filing/publication date) |
-| `before`   | string  | No       | Max date filter (e.g., 'publication:20231231')       |
-| `after`    | string  | No       | Min date filter (e.g., 'publication:20230101')       |
-| `inventor` | string  | No       | Filter by inventor names (comma-separated)           |
-| `assignee` | string  | No       | Filter by assignee names (comma-separated)           |
-| `country`  | string  | No       | Filter by country codes (e.g., 'US', 'WO,JP')        |
-| `language` | string  | No       | Filter by language (e.g., 'ENGLISH', 'JAPANESE')     |
-| `status`   | string  | No       | Filter by status: 'GRANT' or 'APPLICATION'           |
-| `type`     | string  | No       | Filter by type: 'PATENT' or 'DESIGN'                 |
+| `sort`     | string  | No       | `new` or `old`                                       |
+| `before`   | string  | No       | Max date (e.g. `publication:20231231`)               |
+| `after`    | string  | No       | Min date (e.g. `publication:20230101`)               |
+| `inventor` | string  | No       | Inventor name (comma-separated)                      |
+| `assignee` | string  | No       | Assignee name (comma-separated)                      |
+| `country`  | string  | No       | Country code (e.g. `US`, `WO,JP`)                    |
+| `language` | string  | No       | Language (e.g. `ENGLISH`, `JAPANESE`)                |
+| `status`   | string  | No       | `GRANT` or `APPLICATION`                             |
+| `type`     | string  | No       | `PATENT` or `DESIGN`                                 |
 | `scholar`  | boolean | No       | Include Google Scholar results (default: false)      |
 
-**Returns:** Patent metadata including title, publication number, assignee, inventor, dates, and `patent_link` (used for `get_patent`).
+#### `get_patent`
 
-**Example:**
-
-```json
-{
-  "name": "search_patents",
-  "arguments": {
-    "q": "quantum computing",
-    "num": 10,
-    "status": "GRANT",
-    "country": "US",
-    "after": "publication:20230101"
-  }
-}
-```
-
-### `get_patent`
-
-Fetches comprehensive patent data from SerpAPI including claims, description, family members, citations, and metadata. Supports selective content retrieval through the include parameter.
-
-**Parameters:**
+Fetches comprehensive patent data including claims, description, family members, citations, and metadata.
 
 | Parameter    | Type    | Required | Description                                           |
 |--------------|---------|----------|-------------------------------------------------------|
-| `patent_url` | string  | No*      | Full Google Patents URL (from search results)         |
-| `patent_id`  | string  | No*      | Patent ID (e.g., 'US1234567A')                        |
-| `include`    | array   | No       | Array of content sections to include. Valid values (case-insensitive): "claims", "description", "abstract", "family_members", "citations", "metadata". Defaults to ["metadata", "abstract"]. |
-| `max_length` | integer | No       | Maximum character length for returned content. Content will be truncated at natural boundaries (paragraph ends, complete claims). If omitted, no limit is applied. |
+| `patent_url` | string  | No*      | Full Google Patents URL                               |
+| `patent_id`  | string  | No*      | Patent ID (e.g. `US1234567A`)                         |
+| `include`    | array   | No       | Sections to include (default: `["metadata", "abstract"]`) |
+| `max_length` | integer | No       | Maximum character length for content                  |
 
-*At least one parameter (`patent_url` or `patent_id`) must be provided. If both are provided, `patent_url` takes precedence.
-
-**Returns:** JSON object with requested fields:
-
-* `patent_id` (string): Patent identifier
-* `title` (string): Patent title (if "metadata" is in include array)
-* `abstract` (string): Patent abstract summary (if "abstract" is in include array)
-* `description` (string): Full patent description text (if "description" is in include array)
-* `claims` (string[]): Array of patent claims (if "claims" is in include array)
-* `family_members` (array): Patent family members with region and status (if "family_members" is in include array)
-* `citations` (object): Citation counts including forward_citations, backward_citations, family_to_family_citations (if "citations" is in include array)
-* `publication_number` (string): Patent publication number (if "metadata" is in include array)
-* `assignee` (string): Patent assignee (if "metadata" is in include array)
-* `inventor` (string): Patent inventor (if "metadata" is in include array)
-* `priority_date` (string): Priority filing date (if "metadata" is in include array)
-* `filing_date` (string): Filing date (if "metadata" is in include array)
-* `publication_date` (string): Publication date (if "metadata" is in include array)
-* `grant_date` (string): Grant date (if "metadata" is in include array)
-
-Fields are omitted from the response if they are not requested in the include array or if the content could not be retrieved.
-
-**Examples:**
-
-Fetch metadata and abstract (default):
-
-```json
-{
-  "name": "get_patent",
-  "arguments": {
-    "patent_url": "https://patents.google.com/patent/US7654321B2"
-  }
-}
-```
-
-Using patent ID:
-
-```json
-{
-  "name": "get_patent",
-  "arguments": {
-    "patent_id": "US7654321B2"
-  }
-}
-```
-
-Fetch only claims:
-
-```json
-{
-  "name": "get_patent",
-  "arguments": {
-    "patent_id": "US7654321B2",
-    "include": ["claims"]
-  }
-}
-```
-
-Fetch only abstract:
-
-```json
-{
-  "name": "get_patent",
-  "arguments": {
-    "patent_id": "US7654321B2",
-    "include": ["abstract"]
-  }
-}
-```
-
-Fetch comprehensive patent analysis with all sections:
-
-```json
-{
-  "name": "get_patent",
-  "arguments": {
-    "patent_url": "https://patents.google.com/patent/US7654321B2",
-    "include": ["metadata", "abstract", "description", "claims", "family_members", "citations"]
-  }
-}
-```
-
-Fetch content with length limit to minimize token usage:
-
-```json
-{
-  "name": "get_patent",
-  "arguments": {
-    "patent_id": "US7654321B2",
-    "include": ["description", "claims"],
-    "max_length": 5000
-  }
-}
-```
-
-## Typical Workflow
-
-The two tools are designed to work together:
-
-1. **Search for patents** using `search_patents` to find relevant patents
-2. **Get comprehensive data** using `get_patent` for patents of interest
-
-Example workflow:
-
-```typescript
-// Step 1: Search for patents
-const searchResult = await callTool({
-  name: "search_patents",
-  arguments: {
-    q: "neural network chip",
-    num: 10,
-    status: "GRANT"
-  }
-});
-
-// Step 2: Get comprehensive data for first result
-const firstPatent = searchResult.organic_results[0];
-const patentData = await callTool({
-  name: "get_patent",
-  arguments: {
-    patent_url: firstPatent.patent_link,
-    include: ["metadata", "abstract", "description", "claims", "family_members", "citations"]
-  }
-});
-
-// Now you have comprehensive patent data including:
-// - Basic metadata (title, assignee, dates)
-// - Abstract summary
-// - Full description and claims
-// - Patent family members across different countries
-// - Citation counts for patent strength assessment
-console.log(patentData.family_members);
-console.log(patentData.citations);
-```
+*At least one of `patent_url` or `patent_id` must be provided. If both are given, `patent_url` takes precedence.
 
 ## Binary Releases
 
-Pre-built binaries for all supported platforms are available on the [GitHub Releases](https://github.com/SoftwareStartups/patentscope/releases) page. No Bun or Node.js installation required.
-
-### Supported platforms
+Pre-built binaries for all supported platforms are available on the
+[GitHub Releases](https://github.com/SoftwareStartups/patentscope/releases) page.
+No Bun or Node.js installation required.
 
 | Platform | Architecture | Binary |
 |----------|-------------|--------|
@@ -361,149 +224,51 @@ Pre-built binaries for all supported platforms are available on the [GitHub Rele
 | macOS    | x64         | `patentscope-darwin-x64` |
 | macOS    | arm64       | `patentscope-darwin-arm64` |
 
-### Download and run
-
 ```bash
-# Example: macOS arm64
 curl -L https://github.com/SoftwareStartups/patentscope/releases/latest/download/patentscope-darwin-arm64 -o patentscope
 chmod +x patentscope
-SERPAPI_API_KEY=your_key ./patentscope serve
+SERPAPI_API_KEY=your_key ./patentscope search "quantum computing"
 ```
 
 ### Releasing
 
-Push a semver tag to trigger the release workflow. CI must pass before tagging:
+Push a semver tag to trigger the release workflow:
 
 ```bash
 git tag v1.2.3
 git push origin v1.2.3
 ```
 
-The release workflow compiles all four platform binaries and publishes them to GitHub Releases automatically.
-
 ## Development
 
 ### Setup
 
-1. **Clone the repository:**
-
-   ```bash
-   git clone https://github.com/SoftwareStartups/patentscope.git
-   cd patentscope
-   ```
-
-2. **Install dependencies:**
-
-   ```bash
-   bun install
-   ```
-
-3. **Set up environment variables:**
-
-   Create a `.env` file in the project root:
-
-   ```dotenv
-   # SerpApi Configuration
-   # Get your API key from https://serpapi.com/
-   SERPAPI_API_KEY=your_serpapi_key_here
-
-   # Optional: Set log level (error, warn, info, http, verbose, debug, silly)
-   # LOG_LEVEL=info
-   ```
-
-### Development Workflow
-
-**Build the project:**
-
 ```bash
-task build
+git clone https://github.com/SoftwareStartups/patentscope.git
+cd patentscope
+bun install
+cp .env.example .env  # add your SERPAPI_API_KEY
 ```
 
-**Format code:**
+### Workflow
 
 ```bash
-task format
+task build          # Build
+task format         # Format code
+task check          # Lint + typecheck
+task test           # Unit + integration tests
+task test:e2e       # End-to-end tests (real API calls)
+task all            # clean -> install -> build -> check -> test
 ```
 
-**Check code quality (lint + typecheck):**
+### Run locally
 
 ```bash
-task check
-```
-
-**Run tests:**
-
-```bash
-task test
-```
-
-**Clean build artifacts:**
-
-```bash
-task clean
-```
-
-**Full build pipeline:**
-
-```bash
-task all
-# Runs: clean → install → build → check → test
-```
-
-### Run Locally
-
-**Production mode:**
-
-```bash
+bun src/index.ts search "quantum computing"
+bun src/index.ts get US7654321B2
 bun src/index.ts serve
 ```
 
-**Development mode (with auto-rebuild):**
-
-```bash
-bun run dev
-```
-
-## Testing
-
-The project includes unit tests, integration tests, and end-to-end tests with real API calls:
-
-```bash
-# Run all tests (unit + integration)
-task test
-
-# Run unit tests only
-task test:unit
-
-# Run integration tests only
-task test:integration
-
-# Run end-to-end tests with real SerpAPI calls
-task test:e2e
-
-# Run all tests including e2e
-task test:all
-```
-
-### Test Types
-
-- **Unit Tests**: Test individual functions and classes in isolation
-- **Integration Tests**: Test the MCP server functionality with mocked API responses
-- **End-to-End Tests**: Test complete workflows with real SerpAPI calls
-
-The end-to-end tests validate that the server can successfully:
-- Search for patents using real SerpAPI queries
-- Fetch patent content with claims, descriptions, and metadata
-- Handle various search filters and parameters
-- Process patent family members and citations
-- Complete full workflows from search to content retrieval
-
-**Note**: End-to-end tests automatically load `SERPAPI_API_KEY` from the `.env` file and will make actual API calls, which may consume your SerpAPI quota.
-
 ## Logging
 
-* Logs are output to standard error.
-* Log level can be controlled via the `LOG_LEVEL` environment variable
-  (`error`, `warn`, `info`, `http`, `verbose`, `debug`, `silly`).
-  Defaults to `info`.
-* All log output goes exclusively to standard error — no log file is created.
+Logs go to stderr. Control the level via `LOG_LEVEL` (error, warn, info, http, verbose, debug, silly). Defaults to `info`.
