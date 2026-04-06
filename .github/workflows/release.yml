@@ -60,7 +60,7 @@ jobs:
           gh run watch "$RUN_ID" --repo "${{ github.repository }}" --exit-status
 
       - name: Checkout code
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Bun environment
         uses: ./.github/actions/setup-bun-env
@@ -73,7 +73,7 @@ jobs:
             --outfile patentscope-${{ matrix.os }}-${{ matrix.arch }}
 
       - name: Upload binary artifact
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: patentscope-${{ matrix.os }}-${{ matrix.arch }}
           path: patentscope-${{ matrix.os }}-${{ matrix.arch }}
@@ -86,13 +86,12 @@ jobs:
 
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           path: artifacts/
           merge-multiple: true
 
       - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2.5.0
-        with:
-          generate_release_notes: true
-          files: artifacts/*
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create ${{ github.ref_name }} artifacts/* --generate-notes --repo ${{ github.repository }}

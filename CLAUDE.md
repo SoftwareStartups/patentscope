@@ -105,9 +105,10 @@ After each major code change (not markdown documents), run:
 
 ### GitHub Actions
 
-- Always pin actions to full semver tags (e.g., `actions/checkout@v6.0.2`, not `@v4` or `@v6`)
-- To discover the latest version of an action before pinning, use:
+- Always pin actions to full commit SHA with a version comment (e.g., `actions/checkout@de0fac2e...dd # v6.0.2`)
+- To discover the latest version and SHA of an action, use:
   `gh api repos/<owner>/<action>/releases/latest --jq '.tag_name'`
+  `gh api repos/<owner>/<action>/git/ref/tags/<tag> --jq '.object.sha'`
 
 ## Release Process
 
