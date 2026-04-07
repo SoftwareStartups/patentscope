@@ -37,12 +37,14 @@ jobs:
       - name: Verify CI passed for this commit
         env:
           GH_TOKEN: ${{ github.token }}
+          COMMIT_SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
         run: |
-          echo "Waiting for CI to complete for commit ${{ github.sha }}..."
+          echo "Waiting for CI to complete for commit $COMMIT_SHA..."
           for i in $(seq 1 20); do
             RUN_ID=$(gh run list \
-              --repo "${{ github.repository }}" \
-              --commit "${{ github.sha }}" \
+              --repo "$REPO" \
+              --commit "$COMMIT_SHA" \
               --workflow "CI" \
               --limit 1 \
               --json databaseId \
@@ -54,10 +56,10 @@ jobs:
             sleep 15
           done
           if [ -z "$RUN_ID" ]; then
-            echo "No CI run found for commit ${{ github.sha }}. Aborting release."
+            echo "No CI run found for commit $COMMIT_SHA. Aborting release."
             exit 1
           fi
-          gh run watch "$RUN_ID" --repo "${{ github.repository }}" --exit-status
+          gh run watch "$RUN_ID" --repo "$REPO" --exit-status
 
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -94,4 +96,6 @@ jobs:
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create ${{ github.ref_name }} artifacts/* --generate-notes --repo ${{ github.repository }}
+          TAG_NAME: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: gh release create "$TAG_NAME" artifacts/* --generate-notes --repo "$REPO"
