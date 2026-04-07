@@ -200,7 +200,7 @@ describe('SerpApiClient', () => {
 
     const client = new SerpApiClient('invalid_key', mockLogger as never);
     await expect(client.getPatentDetails('INVALID')).rejects.toThrow(
-      'SerpApi patent details request failed'
+      'SerpApi request failed'
     );
   });
 
@@ -216,7 +216,7 @@ describe('SerpApiClient', () => {
 
     const client = new SerpApiClient('test_key', mockLogger as never, 100);
     await expect(client.getPatentDetails('US1234567')).rejects.toThrow(
-      'SerpApi patent details request timed out'
+      'SerpApi request timed out'
     );
   });
 });

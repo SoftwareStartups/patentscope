@@ -11,6 +11,10 @@ import type {
   GetPatentArgs,
   ToolDefinition,
 } from '../types.js';
+import {
+  VALID_SECTIONS,
+  parseIncludeOptions,
+} from '../utils/include-options.js';
 
 export const getPatentToolDefinition: Tool = {
   name: 'get_patent',
@@ -47,38 +51,12 @@ export const getPatentToolDefinition: Tool = {
   },
 };
 
-/**
- * Converts include array to FetchPatentOptions
- */
-function parseIncludeOptions(include: string[]): FetchPatentOptions {
-  return {
-    includeClaims: include.includes('claims'),
-    includeDescription: include.includes('description'),
-    includeAbstract: include.includes('abstract'),
-    includeFamilyMembers: include.includes('family_members'),
-    includeCitations: include.includes('citations'),
-    includeMetadata: include.includes('metadata'),
-  };
-}
-
-/**
- * Validates include parameter values
- */
 function validateIncludeValues(include: string[]): void {
-  const validSections = [
-    'claims',
-    'description',
-    'abstract',
-    'family_members',
-    'citations',
-    'metadata',
-  ];
-
   for (const section of include) {
-    if (!validSections.includes(section)) {
+    if (!VALID_SECTIONS.includes(section as (typeof VALID_SECTIONS)[number])) {
       throw new McpError(
         ErrorCode.InvalidParams,
-        `Invalid include value: "${section}". Valid values are: ${validSections.join(', ')}`
+        `Invalid include value: "${section}". Valid values are: ${VALID_SECTIONS.join(', ')}`
       );
     }
   }

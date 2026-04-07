@@ -2,7 +2,18 @@
  * Common test utilities and helper functions
  */
 
+import { mock } from 'bun:test';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
+import type { Logger } from '../../src/logger.js';
+
+export function createMockLogger(): Logger {
+  return {
+    info: mock(),
+    warn: mock(),
+    error: mock(),
+    debug: mock(),
+  } as unknown as Logger;
+}
 
 // parseToolResponse performs runtime JSON validation before returning
 export function parseToolResponse<T = unknown>(response: CallToolResult): T {

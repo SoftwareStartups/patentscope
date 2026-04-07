@@ -142,5 +142,4 @@ export interface ToolDefinition {
   handler: (args: unknown) => Promise<CallToolResult>;
 }
 
-// Re-export SerpApiClient for use in other modules
 export type { SerpApiClient } from './services/serpapi.js';
