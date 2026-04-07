@@ -21,8 +21,8 @@ export function getConfigPath(): string {
 }
 
 export function readConfig(): PatentscopeConfig | null {
+  const configFile = getConfigPath();
   try {
-    const configFile = getConfigPath();
     if (!fs.existsSync(configFile)) {
       return null;
     }
@@ -32,8 +32,16 @@ export function readConfig(): PatentscopeConfig | null {
       return parsed;
     }
     return null;
-  } catch {
-    return null;
+  } catch (err: unknown) {
+    if (err instanceof SyntaxError) {
+      return null;
+    }
+    if (isNodeError(err) && err.code === 'EACCES') {
+      throw new Error(
+        `Cannot read config file: permission denied. Check permissions on ${configFile}`
+      );
+    }
+    throw err;
   }
 }
 
@@ -49,14 +57,19 @@ export function writeConfig(config: PatentscopeConfig): void {
 }
 
 export function deleteConfig(): boolean {
+  const configFile = getConfigPath();
   try {
-    const configFile = getConfigPath();
     if (fs.existsSync(configFile)) {
       fs.unlinkSync(configFile);
       return true;
     }
     return false;
-  } catch {
+  } catch (err: unknown) {
+    if (isNodeError(err) && err.code === 'EACCES') {
+      throw new Error(
+        `Cannot delete config file: permission denied. Check permissions on ${configFile}`
+      );
+    }
     return false;
   }
 }
@@ -70,4 +83,8 @@ function isValidConfig(value: unknown): value is PatentscopeConfig {
   if (typeof value !== 'object' || value === null) return false;
   const obj = value as Record<string, unknown>;
   return typeof obj.api_key === 'string' && obj.api_key.length > 0;
+}
+
+function isNodeError(err: unknown): err is NodeJS.ErrnoException {
+  return err instanceof Error && 'code' in err;
 }

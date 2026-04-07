@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from 'bun:test';
+import { SerpApiError } from '../../../src/errors.js';
 import { SerpApiClient } from '../../../src/services/serpapi.js';
 
 const mockLogger = {
@@ -117,8 +118,113 @@ describe('SerpApiClient', () => {
 
     const client = new SerpApiClient('invalid_key', mockLogger as never);
     await expect(client.searchPatents({ q: 'test' })).rejects.toThrow(
-      'SerpApi request failed'
+      'Authentication failed'
     );
+  });
+
+  it('should throw SerpApiError with statusCode on API errors', async () => {
+    const mockFetch = makeFetch({
+      ok: false,
+      status: 401,
+      statusText: 'Unauthorized',
+      text: () => Promise.resolve('Invalid API key'),
+    });
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
+
+    const client = new SerpApiClient('invalid_key', mockLogger as never);
+    try {
+      await client.searchPatents({ q: 'test' });
+      expect.unreachable('should have thrown');
+    } catch (err) {
+      expect(err).toBeInstanceOf(SerpApiError);
+      expect((err as SerpApiError).statusCode).toBe(401);
+    }
+  });
+
+  it('should not include HTML body in error message on non-ok response', async () => {
+    const htmlBody =
+      '<!DOCTYPE html><html><body><h1>401 Unauthorized</h1></body></html>';
+    const mockFetch = makeFetch({
+      ok: false,
+      status: 401,
+      statusText: 'Unauthorized',
+      text: () => Promise.resolve(htmlBody),
+    });
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
+
+    const client = new SerpApiClient('invalid_key', mockLogger as never);
+    try {
+      await client.searchPatents({ q: 'test' });
+      expect.unreachable('should have thrown');
+    } catch (err) {
+      expect(err).toBeInstanceOf(SerpApiError);
+      const serpErr = err as SerpApiError;
+      expect(serpErr.userMessage).not.toContain('<html');
+      expect(serpErr.userMessage).not.toContain('DOCTYPE');
+      expect(serpErr.userMessage).toContain('Authentication failed');
+    }
+  });
+
+  it('should handle 200 response with HTML body (non-JSON)', async () => {
+    const mockFetch = makeFetch({
+      ok: true,
+      status: 200,
+      json: () => Promise.reject(new SyntaxError("Unexpected token '<'")),
+    });
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
+
+    const client = new SerpApiClient('test_key', mockLogger as never);
+    try {
+      await client.searchPatents({ q: 'test' });
+      expect.unreachable('should have thrown');
+    } catch (err) {
+      expect(err).toBeInstanceOf(SerpApiError);
+      expect((err as SerpApiError).userMessage).toContain('non-JSON');
+    }
+  });
+
+  it('should produce clean error message on 500 response', async () => {
+    const mockFetch = makeFetch({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error',
+      text: () => Promise.resolve('Server error'),
+    });
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
+
+    const client = new SerpApiClient('test_key', mockLogger as never);
+    try {
+      await client.searchPatents({ q: 'test' });
+      expect.unreachable('should have thrown');
+    } catch (err) {
+      expect(err).toBeInstanceOf(SerpApiError);
+      expect((err as SerpApiError).userMessage).toContain('server error');
+      expect((err as SerpApiError).statusCode).toBe(500);
+    }
+  });
+
+  it('should extract JSON error field from error response', async () => {
+    const mockFetch = makeFetch({
+      ok: false,
+      status: 401,
+      statusText: 'Unauthorized',
+      text: () =>
+        Promise.resolve(JSON.stringify({ error: 'Invalid API key.' })),
+    });
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
+
+    const client = new SerpApiClient('bad_key', mockLogger as never);
+    try {
+      await client.searchPatents({ q: 'test' });
+      expect.unreachable('should have thrown');
+    } catch (err) {
+      expect(err).toBeInstanceOf(SerpApiError);
+      // The logger should have received the extracted error detail
+      const errorCalls = mockLogger.error.mock.calls.flat();
+      expect(
+        errorCalls.some((c: string) => c.includes('Invalid API key'))
+      ).toBe(true);
+    }
   });
 
   it('should not log API key in any log calls', async () => {

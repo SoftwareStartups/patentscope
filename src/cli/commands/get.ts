@@ -1,5 +1,6 @@
 import { defineCommand } from 'clerc';
 import { getConfig } from '../../config.js';
+import { CliError } from '../../errors.js';
 import { createLogger } from '../../logger.js';
 import { PatentService } from '../../services/patent.js';
 import { SerpApiClient } from '../../services/serpapi.js';
@@ -44,7 +45,7 @@ export const get = defineCommand(
       if (
         !VALID_SECTIONS.includes(section as (typeof VALID_SECTIONS)[number])
       ) {
-        throw new Error(
+        throw new CliError(
           `Invalid include value: "${section}". Valid values are: ${VALID_SECTIONS.join(', ')}`
         );
       }

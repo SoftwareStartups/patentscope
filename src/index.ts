@@ -1,9 +1,9 @@
 #!/usr/bin/env bun
 import { run } from './cli/app.js';
+import { sanitizeErrorMessage } from './errors.js';
 
 run().catch((err: unknown) => {
-  process.stderr.write(
-    `Failed to start: ${err instanceof Error ? err.message : String(err)}\n`
-  );
+  const message = err instanceof Error ? err.message : String(err);
+  process.stderr.write(`Error: ${sanitizeErrorMessage(message)}\n`);
   process.exit(1);
 });

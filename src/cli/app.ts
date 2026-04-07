@@ -1,5 +1,6 @@
 import { Cli } from 'clerc';
 import packageJson from '../../package.json' with { type: 'json' };
+import { CliError, SerpApiError, sanitizeErrorMessage } from '../errors.js';
 import { get } from './commands/get.js';
 import { login } from './commands/login.js';
 import { logout } from './commands/logout.js';
@@ -21,6 +22,15 @@ export async function run(
   await Cli()
     .scriptName('patentscope')
     .version(packageJson.version)
+    .errorHandler((error: unknown) => {
+      if (error instanceof SerpApiError || error instanceof CliError) {
+        process.stderr.write(`Error: ${error.userMessage}\n`);
+      } else {
+        const message = error instanceof Error ? error.message : String(error);
+        process.stderr.write(`Error: ${sanitizeErrorMessage(message)}\n`);
+      }
+      process.exit(error instanceof CliError ? error.exitCode : 1);
+    })
     .use(jsonOutputPlugin)
     .command(serve)
     .command(search)

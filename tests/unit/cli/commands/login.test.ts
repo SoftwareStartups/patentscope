@@ -7,6 +7,7 @@ import {
   mock,
   spyOn,
 } from 'bun:test';
+import { SerpApiError } from '../../../../src/errors.js';
 
 const mockWriteConfig = mock();
 const mockGetConfigPath = mock(() => '/fake/config.json');
@@ -108,12 +109,23 @@ describe('login command', () => {
     expect(mockWriteConfig).toHaveBeenCalled();
   });
 
-  it('warns but still saves on validation failure', async () => {
-    mockSearchPatents.mockRejectedValue(new Error('401'));
-    await handler({ flags: { apiKey: 'bad-key' } });
+  it('throws on 401 validation failure (invalid key)', async () => {
+    mockSearchPatents.mockRejectedValue(
+      new SerpApiError('Authentication failed.', { statusCode: 401 })
+    );
+    await expect(handler({ flags: { apiKey: 'bad-key' } })).rejects.toThrow(
+      'invalid'
+    );
+    expect(mockWriteConfig).not.toHaveBeenCalled();
+  });
+
+  it('warns but saves on network validation failure', async () => {
+    mockSearchPatents.mockRejectedValue(new Error('fetch failed'));
+    await handler({ flags: { apiKey: 'maybe-key' } });
     const output = stderrOutput.join('');
     expect(output).toContain('Warning');
-    expect(mockWriteConfig).toHaveBeenCalledWith({ api_key: 'bad-key' });
+    expect(output).toContain('Could not reach');
+    expect(mockWriteConfig).toHaveBeenCalledWith({ api_key: 'maybe-key' });
   });
 
   it('trims whitespace from API key', async () => {
@@ -121,5 +133,14 @@ describe('login command', () => {
       flags: { apiKey: '  spaced-key  ', skipValidation: true },
     });
     expect(mockWriteConfig).toHaveBeenCalledWith({ api_key: 'spaced-key' });
+  });
+
+  it('throws on writeConfig failure', async () => {
+    mockWriteConfig.mockImplementation(() => {
+      throw new Error('EACCES: permission denied');
+    });
+    await expect(
+      handler({ flags: { apiKey: 'good-key', skipValidation: true } })
+    ).rejects.toThrow('Failed to save config');
   });
 });

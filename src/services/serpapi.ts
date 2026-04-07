@@ -1,3 +1,8 @@
+import {
+  SerpApiError,
+  sanitizeErrorMessage,
+  serpApiErrorMessage,
+} from '../errors.js';
 import type { Logger } from '../logger.js';
 import type {
   SearchPatentsArgs,
@@ -68,29 +73,41 @@ export class SerpApiClient {
       const response = await fetch(apiUrl, { signal: controller.signal });
 
       if (!response.ok) {
-        const errorBody = await this.getErrorBody(response);
+        const { errorDetail, rawBody } = await this.parseErrorBody(response);
         this.logger.error(
-          `SerpApi request failed for ${label} with status ${response.status} ${response.statusText}. Response body: ${errorBody}`
+          `SerpApi request failed for ${label} with status ${response.status} ${response.statusText}. Detail: ${errorDetail}. Raw body: ${rawBody}`
         );
-        throw new Error(
-          `SerpApi request failed: ${response.statusText}. Body: ${errorBody}`
+        const userMessage = serpApiErrorMessage(response.status);
+        throw new SerpApiError(userMessage, { statusCode: response.status });
+      }
+
+      let data: T;
+      try {
+        data = (await response.json()) as T;
+      } catch (parseError: unknown) {
+        this.logger.error(
+          `SerpApi returned non-JSON response for ${label} (status ${response.status})`
+        );
+        throw new SerpApiError(
+          'SerpApi returned unexpected non-JSON response.',
+          { statusCode: response.status, cause: parseError }
         );
       }
 
-      const data = (await response.json()) as T;
       this.logger.info(`SerpApi request successful for ${label}`);
       this.logger.debug(`SerpApi response status: ${response.status}`);
 
-      clearTimeout(timeoutId);
       return data;
     } catch (error: unknown) {
-      clearTimeout(timeoutId);
+      if (error instanceof SerpApiError) {
+        throw error;
+      }
 
       if (error instanceof Error && error.name === 'AbortError') {
         this.logger.error(
           `SerpApi request timed out after ${this.timeoutMs}ms for ${label}`
         );
-        throw new Error('SerpApi request timed out');
+        throw new SerpApiError('SerpApi request timed out.');
       }
 
       const errorMessage =
@@ -98,21 +115,47 @@ export class SerpApiClient {
       this.logger.error(
         `Error during SerpApi fetch for ${label}: ${errorMessage}`
       );
-      if (error instanceof Error && error.stack) {
-        this.logger.error(`Stack trace: ${error.stack}`);
-      }
-      throw new Error(`An unexpected error occurred: ${errorMessage}`);
+      throw new SerpApiError(sanitizeErrorMessage(errorMessage), {
+        cause: error,
+      });
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
-  private async getErrorBody(response: Response): Promise<string> {
+  private async parseErrorBody(
+    response: Response
+  ): Promise<{ errorDetail: string; rawBody: string }> {
     try {
-      return await response.text();
-    } catch (bodyError) {
+      const text = await response.text();
+      try {
+        const json: unknown = JSON.parse(text);
+        if (
+          typeof json === 'object' &&
+          json !== null &&
+          'error' in json &&
+          typeof (json as Record<string, unknown>).error === 'string'
+        ) {
+          return {
+            errorDetail: (json as Record<string, unknown>).error as string,
+            rawBody: text.slice(0, 500),
+          };
+        }
+        return { errorDetail: text.slice(0, 200), rawBody: text.slice(0, 500) };
+      } catch {
+        return {
+          errorDetail: '(non-JSON response)',
+          rawBody: text.slice(0, 500),
+        };
+      }
+    } catch (bodyError: unknown) {
       this.logger.warn(
         `Failed to read error response body: ${bodyError instanceof Error ? bodyError.message : String(bodyError)}`
       );
-      return 'Could not retrieve error body.';
+      return {
+        errorDetail: 'Could not retrieve error body.',
+        rawBody: '',
+      };
     }
   }
 }
