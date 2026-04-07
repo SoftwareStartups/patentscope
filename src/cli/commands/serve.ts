@@ -1,4 +1,5 @@
 import { defineCommand } from 'clerc';
+import packageJson from '../../../package.json' with { type: 'json' };
 import { getConfig } from '../../config.js';
 import { createLogger } from '../../logger.js';
 import { PatentScopeServer } from '../../server.js';
@@ -8,7 +9,6 @@ import {
   createGetPatentTool,
   createSearchPatentsTool,
 } from '../../tools/index.js';
-import packageJson from '../../../package.json' with { type: 'json' };
 
 export const serve = defineCommand(
   { name: 'serve', description: 'Start the MCP server on stdio' },

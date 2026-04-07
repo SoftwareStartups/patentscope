@@ -26,12 +26,36 @@ Pre-built binaries (no runtime required) are available on the
 * **Bun:** Version 1.0 or higher (not needed when using a pre-built binary).
 * **SerpApi API Key:** A valid key from [SerpApi](https://serpapi.com/).
 
+## Configuration
+
+Save your API key once with the `login` command:
+
+```bash
+patentscope login
+# Enter your SerpApi API key: ****
+
+# Or non-interactively
+patentscope login --api-key YOUR_KEY
+```
+
+The key is stored in `~/.config/patentscope/config.json` with strict file permissions.
+
+To remove the stored key:
+
+```bash
+patentscope logout
+```
+
+The `SERPAPI_API_KEY` environment variable takes precedence over the stored config, useful for CI or temporary overrides.
+
 ## CLI Usage
 
 ```
 Usage: patentscope <command> [flags]
 
 Commands:
+  login              Save your SerpApi API key
+  logout             Remove saved API key
   search [query]     Search Google Patents
   get <patentId>     Get patent details
   serve              Start the MCP server on stdio
@@ -117,26 +141,6 @@ patentscope --version --json
 patentscope --help --json
 ```
 
-## Configuration
-
-The SerpApi API key can be provided via:
-
-1. **Environment variable (recommended):**
-
-   ```bash
-   export SERPAPI_API_KEY=your_key
-   patentscope search "quantum computing"
-   ```
-
-2. **.env file** in the working directory or `~/.patentscope.env`:
-
-   ```dotenv
-   SERPAPI_API_KEY=your_key
-   # LOG_LEVEL=debug
-   ```
-
-   Lookup order: `./.env` then `~/.patentscope.env`.
-
 ## MCP Server
 
 The `serve` command starts an MCP server on stdio, exposing two tools:
@@ -151,10 +155,7 @@ Using a pre-built binary (download from [GitHub Releases](https://github.com/Sof
   "mcpServers": {
     "patentscope": {
       "command": "/path/to/patentscope-darwin-arm64",
-      "args": ["serve"],
-      "env": {
-        "SERPAPI_API_KEY": "YOUR_SERPAPI_KEY"
-      }
+      "args": ["serve"]
     }
   }
 }
@@ -167,14 +168,13 @@ Using `bunx`:
   "mcpServers": {
     "patentscope": {
       "command": "bunx",
-      "args": ["@softwarestartups/patentscope", "serve"],
-      "env": {
-        "SERPAPI_API_KEY": "YOUR_SERPAPI_KEY"
-      }
+      "args": ["@softwarestartups/patentscope", "serve"]
     }
   }
 }
 ```
+
+The MCP server uses the API key from `~/.config/patentscope/config.json` (set via `patentscope login`). Override with the `SERPAPI_API_KEY` environment variable if needed.
 
 ### MCP Tools
 
@@ -227,7 +227,8 @@ No Bun or Node.js installation required.
 ```bash
 curl -L https://github.com/SoftwareStartups/patentscope/releases/latest/download/patentscope-darwin-arm64 -o patentscope
 chmod +x patentscope
-SERPAPI_API_KEY=your_key ./patentscope search "quantum computing"
+./patentscope login
+./patentscope search "quantum computing"
 ```
 
 ### Releasing
@@ -247,7 +248,7 @@ git push origin v1.2.3
 git clone https://github.com/SoftwareStartups/patentscope.git
 cd patentscope
 bun install
-cp .env.example .env  # add your SERPAPI_API_KEY
+patentscope login  # or: export SERPAPI_API_KEY=your_key
 ```
 
 ### Workflow

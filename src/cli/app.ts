@@ -1,6 +1,8 @@
 import { Cli } from 'clerc';
 import packageJson from '../../package.json' with { type: 'json' };
 import { get } from './commands/get.js';
+import { login } from './commands/login.js';
+import { logout } from './commands/logout.js';
 import { search } from './commands/search.js';
 import { serve } from './commands/serve.js';
 import { jsonOutputPlugin } from './plugins/json-output.js';
@@ -23,5 +25,7 @@ export async function run(
     .command(serve)
     .command(search)
     .command(get)
+    .command(login)
+    .command(logout)
     .parse(resolveArgv(argv));
 }

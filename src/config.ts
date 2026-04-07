@@ -1,6 +1,4 @@
-import * as dotenv from 'dotenv';
-
-dotenv.config();
+import { readApiKeyFromConfig } from './utils/config-file.js';
 
 export interface Config {
   serpApiKey: string;
@@ -9,10 +7,12 @@ export interface Config {
 }
 
 export const getConfig = (): Config => {
-  const serpApiKey = process.env.SERPAPI_API_KEY;
+  const serpApiKey = process.env.SERPAPI_API_KEY || readApiKeyFromConfig();
 
   if (!serpApiKey) {
-    throw new Error('SERPAPI_API_KEY environment variable is not set.');
+    throw new Error(
+      'SerpApi API key not found. Set SERPAPI_API_KEY environment variable or run: patentscope login'
+    );
   }
 
   return {

@@ -9,7 +9,6 @@ import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import type { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import type { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import * as dotenv from 'dotenv';
 import type { PatentData, SerpApiResponse } from '../src/types.js';
 import {
   assertHasAbstract,
@@ -22,9 +21,6 @@ import {
   createMcpTestClient,
 } from './helpers/mcp-client.js';
 import { parseToolResponse } from './helpers/test-utils.js';
-
-// Load environment variables from .env file
-dotenv.config();
 
 describe('E2E Tests - MCP Server with Real SerpAPI', () => {
   let client: Client;
