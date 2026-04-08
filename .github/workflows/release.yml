@@ -19,18 +19,32 @@ jobs:
             target: bun-linux-x64
             os: linux
             arch: x64
+            ext: ""
           - runner: ubuntu-24.04-arm
             target: bun-linux-arm64
             os: linux
             arch: arm64
+            ext: ""
           - runner: ubuntu-latest
             target: bun-darwin-x64
             os: darwin
             arch: x64
+            ext: ""
           - runner: macos-15
             target: bun-darwin-arm64
             os: darwin
             arch: arm64
+            ext: ""
+          - runner: ubuntu-latest
+            target: bun-windows-x64
+            os: windows
+            arch: x64
+            ext: ".exe"
+          - runner: ubuntu-latest
+            target: bun-windows-arm64
+            os: windows
+            arch: arm64
+            ext: ".exe"
     runs-on: ${{ matrix.runner }}
 
     steps:
@@ -72,13 +86,13 @@ jobs:
           bun build src/index.ts \
             --compile \
             --target=${{ matrix.target }} \
-            --outfile patentscope-${{ matrix.os }}-${{ matrix.arch }}
+            --outfile patentscope-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.ext }}
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: patentscope-${{ matrix.os }}-${{ matrix.arch }}
-          path: patentscope-${{ matrix.os }}-${{ matrix.arch }}
+          path: patentscope-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.ext }}
           retention-days: 1
 
   release:

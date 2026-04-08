@@ -18,13 +18,15 @@ tasks:
       - bun build src/index.ts --compile --outfile dist/patentscope
 
   compile:all:
-    desc: Compile release binaries for all platforms (linux/darwin × x64/arm64)
+    desc: Compile release binaries for all platforms (linux/darwin/windows × x64/arm64)
     cmds:
       - mkdir -p dist
       - bun build src/index.ts --compile --target=bun-linux-x64 --outfile dist/patentscope-linux-x64
       - bun build src/index.ts --compile --target=bun-linux-arm64 --outfile dist/patentscope-linux-arm64
       - bun build src/index.ts --compile --target=bun-darwin-x64 --outfile dist/patentscope-darwin-x64
       - bun build src/index.ts --compile --target=bun-darwin-arm64 --outfile dist/patentscope-darwin-arm64
+      - bun build src/index.ts --compile --target=bun-windows-x64 --outfile dist/patentscope-windows-x64.exe
+      - bun build src/index.ts --compile --target=bun-windows-arm64 --outfile dist/patentscope-windows-arm64.exe
 
   clean:
     desc: Remove build artifacts

@@ -38,5 +38,5 @@ Always verify the SHA matches the expected release tag before updating.
 
 - Triggers: push of `v*` tags
 - Verifies CI passed for the tagged commit before building
-- Matrix build: linux-x64, linux-arm64, darwin-x64, darwin-arm64
+- Matrix build: linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64, windows-arm64
 - Creates GitHub release with compiled binaries
