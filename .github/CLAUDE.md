@@ -31,7 +31,8 @@ Always verify the SHA matches the expected release tag before updating.
 ## CI Workflow (`workflows/ci.yml`)
 
 - Triggers: push to any branch, PRs to `main`
-- Jobs: lint-and-typecheck → unit-tests → build + integration-tests (parallel after gates)
+- Jobs: lint-and-typecheck → [unit-tests, build] (parallel); build → integration-tests
+- Uses `task` commands for all CI steps
 - Permissions: `contents: read` only
 
 ## Release Workflow (`workflows/release.yml`)
