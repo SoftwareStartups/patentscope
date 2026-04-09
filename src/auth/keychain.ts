@@ -25,12 +25,19 @@ export async function deleteSecret(name: string): Promise<boolean> {
   }
 }
 
+// biome-ignore lint/complexity/useRegexLiterals: RegExp constructor avoids biome noControlCharactersInRegex false positive
+const CONTROL_CHARS = new RegExp('[\\x00-\\x08\\x0b\\x0c\\x0e-\\x1f]');
+
+function hasControlCharacters(value: string): boolean {
+  return CONTROL_CHARS.test(value);
+}
+
 export function sanitizeCredential(value: string): string {
   const trimmed = value.trim();
   if (!trimmed) throw new Error('Credential cannot be empty');
   if (trimmed.length > 4096)
     throw new Error('Credential exceeds maximum length');
-  if (/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(trimmed))
+  if (hasControlCharacters(trimmed))
     throw new Error('Credential contains invalid control characters');
   return trimmed;
 }

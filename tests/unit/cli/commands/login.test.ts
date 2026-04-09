@@ -9,8 +9,8 @@ import {
 } from 'bun:test';
 import { SerpApiError } from '../../../../src/errors.js';
 
-const mockWriteConfig = mock();
-const mockGetConfigPath = mock(() => '/fake/config.json');
+const mockSetSecret = mock(() => Promise.resolve());
+const mockSanitizeCredential = mock((v: string) => v.trim());
 const mockSearchPatents = mock();
 
 await mock.module('clerc', () => ({
@@ -20,9 +20,9 @@ await mock.module('clerc', () => ({
   }),
 }));
 
-await mock.module('../../../../src/utils/config-file.js', () => ({
-  writeConfig: mockWriteConfig,
-  getConfigPath: mockGetConfigPath,
+await mock.module('../../../../src/auth/keychain.js', () => ({
+  setSecret: mockSetSecret,
+  sanitizeCredential: mockSanitizeCredential,
 }));
 
 await mock.module('../../../../src/logger.js', () => ({
@@ -61,7 +61,9 @@ describe('login command', () => {
   beforeEach(() => {
     stderrOutput = [];
     stdoutOutput = [];
-    mockWriteConfig.mockClear();
+    mockSetSecret.mockClear();
+    mockSanitizeCredential.mockClear();
+    mockSanitizeCredential.mockImplementation((v: string) => v.trim());
     mockSearchPatents.mockClear();
     spyOn(process.stderr, 'write').mockImplementation(
       (chunk: string | Uint8Array<ArrayBufferLike>) => {
@@ -86,27 +88,27 @@ describe('login command', () => {
     mock.restore();
   });
 
-  it('saves API key from --api-key flag', async () => {
+  it('saves API key to keychain from --api-key flag', async () => {
     await handler({ flags: { apiKey: 'test-key-123', skipValidation: true } });
-    expect(mockWriteConfig).toHaveBeenCalledWith({ api_key: 'test-key-123' });
+    expect(mockSetSecret).toHaveBeenCalledWith('SERPAPI_API_KEY', 'test-key-123');
   });
 
-  it('prints success message with config path', async () => {
+  it('prints success message mentioning keychain', async () => {
     await handler({ flags: { apiKey: 'my-key', skipValidation: true } });
     const output = stdoutOutput.join('');
-    expect(output).toContain('/fake/config.json');
+    expect(output).toContain('OS keychain');
   });
 
   it('validates API key by default', async () => {
     await handler({ flags: { apiKey: 'valid-key' } });
     expect(mockSearchPatents).toHaveBeenCalled();
-    expect(mockWriteConfig).toHaveBeenCalledWith({ api_key: 'valid-key' });
+    expect(mockSetSecret).toHaveBeenCalledWith('SERPAPI_API_KEY', 'valid-key');
   });
 
   it('skips validation with --skip-validation', async () => {
     await handler({ flags: { apiKey: 'any-key', skipValidation: true } });
     expect(mockSearchPatents).not.toHaveBeenCalled();
-    expect(mockWriteConfig).toHaveBeenCalled();
+    expect(mockSetSecret).toHaveBeenCalled();
   });
 
   it('throws on 401 validation failure (invalid key)', async () => {
@@ -116,7 +118,7 @@ describe('login command', () => {
     await expect(handler({ flags: { apiKey: 'bad-key' } })).rejects.toThrow(
       'invalid'
     );
-    expect(mockWriteConfig).not.toHaveBeenCalled();
+    expect(mockSetSecret).not.toHaveBeenCalled();
   });
 
   it('warns but saves on network validation failure', async () => {
@@ -125,22 +127,21 @@ describe('login command', () => {
     const output = stderrOutput.join('');
     expect(output).toContain('Warning');
     expect(output).toContain('Could not reach');
-    expect(mockWriteConfig).toHaveBeenCalledWith({ api_key: 'maybe-key' });
+    expect(mockSetSecret).toHaveBeenCalledWith('SERPAPI_API_KEY', 'maybe-key');
   });
 
-  it('trims whitespace from API key', async () => {
+  it('sanitizes API key input', async () => {
     await handler({
       flags: { apiKey: '  spaced-key  ', skipValidation: true },
     });
-    expect(mockWriteConfig).toHaveBeenCalledWith({ api_key: 'spaced-key' });
+    expect(mockSanitizeCredential).toHaveBeenCalledWith('  spaced-key  ');
+    expect(mockSetSecret).toHaveBeenCalledWith('SERPAPI_API_KEY', 'spaced-key');
   });
 
-  it('throws on writeConfig failure', async () => {
-    mockWriteConfig.mockImplementation(() => {
-      throw new Error('EACCES: permission denied');
-    });
+  it('throws when keychain is unavailable', async () => {
+    mockSetSecret.mockRejectedValue(new Error('keychain unavailable'));
     await expect(
       handler({ flags: { apiKey: 'good-key', skipValidation: true } })
-    ).rejects.toThrow('Failed to save config');
+    ).rejects.toThrow('OS keychain not available');
   });
 });

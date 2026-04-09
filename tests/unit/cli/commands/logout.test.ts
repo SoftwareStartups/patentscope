@@ -8,9 +8,7 @@ import {
   spyOn,
 } from 'bun:test';
 
-const mockReadConfig = mock();
-const mockDeleteConfig = mock();
-const mockGetConfigPath = mock(() => '/fake/config.json');
+const mockDeleteSecret = mock(() => Promise.resolve(true));
 
 await mock.module('clerc', () => ({
   defineCommand: (config: Record<string, unknown>, handler: unknown) => ({
@@ -19,10 +17,8 @@ await mock.module('clerc', () => ({
   }),
 }));
 
-await mock.module('../../../../src/utils/config-file.js', () => ({
-  readConfig: mockReadConfig,
-  deleteConfig: mockDeleteConfig,
-  getConfigPath: mockGetConfigPath,
+await mock.module('../../../../src/auth/keychain.js', () => ({
+  deleteSecret: mockDeleteSecret,
 }));
 
 const { logout } = await import('../../../../src/cli/commands/logout.js');
@@ -30,24 +26,14 @@ const handler = (logout as unknown as { handler: () => Promise<void> }).handler;
 
 describe('logout command', () => {
   let stdoutOutput: string[];
-  let stderrOutput: string[];
 
   beforeEach(() => {
     stdoutOutput = [];
-    stderrOutput = [];
-    mockReadConfig.mockClear();
-    mockDeleteConfig.mockClear();
+    mockDeleteSecret.mockClear();
+    mockDeleteSecret.mockResolvedValue(true);
     spyOn(process.stdout, 'write').mockImplementation(
       (chunk: string | Uint8Array<ArrayBufferLike>) => {
         stdoutOutput.push(
-          typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString()
-        );
-        return true;
-      }
-    );
-    spyOn(process.stderr, 'write').mockImplementation(
-      (chunk: string | Uint8Array<ArrayBufferLike>) => {
-        stderrOutput.push(
           typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString()
         );
         return true;
@@ -59,20 +45,16 @@ describe('logout command', () => {
     mock.restore();
   });
 
-  it('deletes config and prints success', async () => {
-    mockReadConfig.mockReturnValue({ api_key: 'existing-key' });
-    mockDeleteConfig.mockReturnValue(true);
+  it('deletes from keychain and prints success', async () => {
     await handler();
-    expect(mockDeleteConfig).toHaveBeenCalled();
+    expect(mockDeleteSecret).toHaveBeenCalledWith('SERPAPI_API_KEY');
     const output = stdoutOutput.join('');
-    expect(output).toContain('API key removed');
-    expect(output).toContain('/fake/config.json');
+    expect(output).toContain('Credentials removed');
   });
 
   it('prints message when already logged out', async () => {
-    mockReadConfig.mockReturnValue(null);
+    mockDeleteSecret.mockResolvedValue(false);
     await handler();
-    expect(mockDeleteConfig).not.toHaveBeenCalled();
     const output = stdoutOutput.join('');
     expect(output).toContain('Already logged out');
   });

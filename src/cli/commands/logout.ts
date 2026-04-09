@@ -1,9 +1,5 @@
 import { defineCommand } from 'clerc';
-import {
-  deleteConfig,
-  getConfigPath,
-  readConfig,
-} from '../../utils/config-file.js';
+import { deleteSecret } from '../../auth/keychain.js';
 
 export const logout = defineCommand(
   {
@@ -11,18 +7,19 @@ export const logout = defineCommand(
     description: 'Remove saved API key',
   },
   async () => {
-    const existing = readConfig();
-    if (!existing) {
-      process.stdout.write('No saved API key found. Already logged out.\n');
+    const deleted = await deleteSecret('SERPAPI_API_KEY');
+
+    if (!deleted) {
+      process.stdout.write('No stored credentials found. Already logged out.\n');
       return;
     }
 
-    const deleted = deleteConfig();
-    if (deleted) {
-      process.stdout.write(`API key removed from ${getConfigPath()}\n`);
-    } else {
-      process.stderr.write('Error: Failed to remove config file.\n');
-      process.exit(1);
+    process.stdout.write('Credentials removed.\n');
+
+    if (process.env.SERPAPI_API_KEY) {
+      process.stdout.write(
+        'Note: SERPAPI_API_KEY environment variable is still set.\n'
+      );
     }
   }
 );

@@ -11,7 +11,8 @@
     "moduleResolution": "NodeNext" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
     "resolveJsonModule": true /* Include modules imported with '.json' extension */,
     "declaration": true /* Generates corresponding '.d.ts' file. */,
-    "sourceMap": false /* Source maps disabled — dev runs via Bun directly */
+    "sourceMap": false /* Source maps disabled — dev runs via Bun directly */,
+    "types": ["bun-types"]
   },
   "include": ["src/**/*"] /* Specifies the files to include in the program. */,
   "exclude": [

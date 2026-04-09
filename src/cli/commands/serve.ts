@@ -13,7 +13,7 @@ import {
 export const serve = defineCommand(
   { name: 'serve', description: 'Start the MCP server on stdio' },
   async () => {
-    const config = getConfig();
+    const config = await getConfig();
     const logger = createLogger(config.logLevel);
 
     logger.info('=== PatentScope Server started ===');

@@ -27,7 +27,7 @@ export const get = defineCommand(
     },
   },
   async (ctx) => {
-    const config = getConfig();
+    const config = await getConfig();
     const logger = createLogger(config.logLevel);
     const serpApiClient = new SerpApiClient(
       config.serpApiKey,

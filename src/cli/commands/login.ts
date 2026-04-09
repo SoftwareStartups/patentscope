@@ -1,10 +1,10 @@
 import * as readline from 'node:readline';
 import { Writable } from 'node:stream';
 import { defineCommand } from 'clerc';
+import { sanitizeCredential, setSecret } from '../../auth/keychain.js';
 import { CliError, SerpApiError } from '../../errors.js';
 import type { Logger } from '../../logger.js';
 import { SerpApiClient } from '../../services/serpapi.js';
-import { getConfigPath, writeConfig } from '../../utils/config-file.js';
 
 interface ValidationResult {
   valid: boolean;
@@ -27,13 +27,16 @@ export const login = defineCommand(
     },
   },
   async (ctx) => {
-    const apiKey = ctx.flags.apiKey || (await promptForApiKey());
+    const raw = ctx.flags.apiKey || (await promptForApiKey());
 
-    if (!apiKey || apiKey.trim().length === 0) {
-      throw new CliError('API key cannot be empty.');
+    let trimmedKey: string;
+    try {
+      trimmedKey = sanitizeCredential(raw);
+    } catch (err: unknown) {
+      throw new CliError(
+        err instanceof Error ? err.message : 'Invalid credential.'
+      );
     }
-
-    const trimmedKey = apiKey.trim();
 
     if (!ctx.flags.skipValidation) {
       const result = await validateApiKey(trimmedKey);
@@ -50,13 +53,15 @@ export const login = defineCommand(
     }
 
     try {
-      writeConfig({ api_key: trimmedKey });
+      await setSecret('SERPAPI_API_KEY', trimmedKey);
     } catch (err: unknown) {
-      const detail = err instanceof Error ? err.message : 'unknown error';
-      throw new CliError(`Failed to save config: ${detail}`, { cause: err });
+      throw new CliError(
+        'OS keychain not available. Set SERPAPI_API_KEY environment variable instead.',
+        { cause: err }
+      );
     }
 
-    process.stdout.write(`API key saved to ${getConfigPath()}\n`);
+    process.stdout.write('API key saved to OS keychain.\n');
   }
 );
 

@@ -1,4 +1,4 @@
-import { readApiKeyFromConfig } from './utils/config-file.js';
+import { getSecret } from './auth/keychain.js';
 
 export interface Config {
   serpApiKey: string;
@@ -6,8 +6,9 @@ export interface Config {
   logLevel: string;
 }
 
-export const getConfig = (): Config => {
-  const serpApiKey = process.env.SERPAPI_API_KEY || readApiKeyFromConfig();
+export const getConfig = async (): Promise<Config> => {
+  const serpApiKey =
+    process.env.SERPAPI_API_KEY || (await getSecret('SERPAPI_API_KEY'));
 
   if (!serpApiKey) {
     throw new Error(
