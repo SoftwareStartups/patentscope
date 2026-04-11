@@ -90,7 +90,10 @@ describe('login command', () => {
 
   it('saves API key to keychain from --api-key flag', async () => {
     await handler({ flags: { apiKey: 'test-key-123', skipValidation: true } });
-    expect(mockSetSecret).toHaveBeenCalledWith('SERPAPI_API_KEY', 'test-key-123');
+    expect(mockSetSecret).toHaveBeenCalledWith(
+      'SERPAPI_API_KEY',
+      'test-key-123'
+    );
   });
 
   it('prints success message mentioning keychain', async () => {

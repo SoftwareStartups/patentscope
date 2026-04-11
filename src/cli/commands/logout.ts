@@ -10,7 +10,9 @@ export const logout = defineCommand(
     const deleted = await deleteSecret('SERPAPI_API_KEY');
 
     if (!deleted) {
-      process.stdout.write('No stored credentials found. Already logged out.\n');
+      process.stdout.write(
+        'No stored credentials found. Already logged out.\n'
+      );
       return;
     }
 
