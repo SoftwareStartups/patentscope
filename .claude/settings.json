@@ -7,13 +7,16 @@
       "WebSearch",
       "WebFetch",
       "Skill(commit-commands:commit)",
-      "Bash(task --list:*)",
-      "Bash(task lint:*)",
-      "Bash(task format:*)",
-      "Bash(task check:*)",
-      "Bash(task test:*)",
-      "Bash(task ci:*)",
-      "Bash(bun test:*)"
+      "Bash(task --list *)",
+      "Bash(task lint *)",
+      "Bash(task format *)",
+      "Bash(task check *)",
+      "Bash(task typecheck *)",
+      "Bash(task test *)",
+      "Bash(task build *)",
+      "Bash(task ci *)",
+      "Bash(task compile *)",
+      "Bash(bun test *)"
     ]
   },
   "hooks": {
@@ -23,7 +26,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "case \"$CLAUDE_TOOL_INPUT_FILE_PATH\" in *.ts) cd /Volumes/work/softwarestartups/evercli && bunx biome format --write \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null && bunx tsc --noEmit 2>&1 | head -20 ;; esac",
+            "command": "case \"$CLAUDE_TOOL_INPUT_FILE_PATH\" in *.ts) bunx biome format --write \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null && bunx tsc --noEmit 2>&1 | head -20 ;; esac",
             "timeout": 30
           }
         ]
