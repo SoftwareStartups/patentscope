@@ -3,9 +3,21 @@ paths:
   - "**/*.ts"
 ---
 
+## TypeScript
+
+- Strict mode, ES2022 target, NodeNext modules
 - No `any` — use `unknown` + type narrowing
 - No default exports — named exports only
 - Prefer `interface` over `type` for object shapes
-- Export types alongside the functions that consume them
-- `src/edam/` is generated — do not edit (run `task thrift`)
-- Run `task check` (lint + typecheck) before committing
+- Prefer functional style, composition over inheritance
+- Export types alongside consuming functions
+
+## Runtime
+
+- Bun only — no Node.js polyfills, no `@types/node`, no `node-fetch`
+- Use global `fetch`, Bun built-in APIs
+
+## Formatting
+
+- Biome (indent 2, single quotes, semicolons, trailing commas es5)
+- Run `task check` before committing (lint + typecheck + test)

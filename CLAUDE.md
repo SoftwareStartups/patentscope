@@ -1,10 +1,47 @@
 # Patentscope
 
-CLI for searching and retrieving Google Patents via SerpApi. Three commands: `search`, `get`, `serve` (MCP server). Requires `SERPAPI_API_KEY` env var.
+CLI for searching and retrieving Google Patents via SerpApi. Three commands: `search`, `get`, `serve` (MCP server).
 
-## Key Files & Directories
+## Environment Variables
 
+| Variable | Purpose |
+|----------|---------|
+| `SERPAPI_API_KEY` | SerpApi API key (or use `patentscope login`) |
+
+## Commands
+
+```bash
+# Setup
+bun install                          # Install dependencies
+task build                           # Compile TypeScript to build/
+task clean                           # Remove build/ and dist/
+
+# Quality
+task lint                            # Lint with Biome
+task format                          # Format with Biome (write)
+task test                            # Run tests (bun test)
+task check                           # Lint + typecheck + tests
+
+# Pipelines
+task ci                              # Full CI locally: clean -> install -> format:check -> check -> build
+
+# Release
+task compile                         # Build standalone binary for current platform
+task compile:all                     # Build binaries for all 6 platforms
+
+# Auth
+bun run src/index.ts login           # Store API key in OS keychain
+bun run src/index.ts logout          # Remove stored credentials
+
+# Run (dev, without compiling)
+bun run src/index.ts serve           # Start MCP server
+bun run src/index.ts search "query"  # Search patents
+bun run src/index.ts get <patent-id> # Get patent details
 ```
+
+## Architecture
+
+```text
 src/
   index.ts          # Thin entry point (shebang + run())
   server.ts         # MCP tool registration
@@ -37,88 +74,29 @@ tests/
   integration-mocked-api.test.ts # Full MCP flow with mock SerpApi
   e2e-real-api.test.ts           # Real SerpApi (needs key)
   helpers/                       # Shared test utilities
-.github/workflows/
-  ci.yml       # Lint → unit → build → integration
-  release.yml  # Tag push → cross-compiled binaries
-Taskfile.yml   # Developer commands (task check, task test...)
-Dockerfile     # Container image
 ```
 
 ## Principles
 
 ### Forward-Looking Approach
 
-- **Never implement backward compatibility**
-- Always implement according to the latest insight and best practices
+- Never implement backward compatibility
 - Refactor boldly when better approaches are identified
 - Embrace breaking changes when they lead to better design
 
 ### Communication Style
 
-- **Do not output verbose summaries of work done or changes implemented**
-- Be concise and direct in responses
-- Focus on what matters now, not what changed
-- Let the code speak for itself
+- Do not output verbose summaries of work done
+- Be concise and direct — let the code speak for itself
 
 ### Documentation
 
-- **Do not generate documentation files unless explicitly asked**
-- Document the current, latest state only
-- Never document changes or differences versus previous or historic implementation
+- Do not generate documentation files unless explicitly asked
+- Document current state only, never changes or history
 
-## Coding Standards
-
-### TypeScript
-
-- Use latest stable Bun and TypeScript syntax
-- Ensure all code is correctly typed (no `any` types unless absolutely necessary)
-- Prefer functional style over classes
-- Follow clean code principles: DRY, SOLID, meaningful names, small functions
-- Use modern JavaScript/TypeScript features (async/await, destructuring, optional chaining, nullish coalescing)
-- Prefer pure functions and immutability
-- Avoid side effects where possible
-- Use composition over inheritance
-- Keep functions small and focused on single responsibility
-
-### Runtime
-
-This project runs exclusively on Bun. Never use Node.js polyfills or Node-specific packages:
-
-- Use global `fetch` — do NOT import `node-fetch`
-- Use Bun's built-in APIs where available
-- Do not add `@types/node` or configure Node-specific settings
-
-### Testing
-
-- Write unit tests for major features
-- Maintain test coverage for critical functionality
-- Tests should be clear, focused, and maintainable
-- **Add a unit test for every relevant bug fix** to prevent regression
-
-### Build Verification
-
-After each major code change (not markdown documents), run:
-
-- `task format` — format code
-- `task check` — verify code quality and types
-- `task test` — ensure all tests pass
-
-### GitHub Actions
-
-- Always pin actions to full commit SHA with a version comment (e.g., `actions/checkout@de0fac2e...dd # v6.0.2`)
-- To discover the latest version and SHA of an action, use:
-  `gh api repos/<owner>/<action>/releases/latest --jq '.tag_name'`
-  `gh api repos/<owner>/<action>/git/ref/tags/<tag> --jq '.object.sha'`
-
-## Release Process
-
-- Releases are triggered by pushing a semver tag (`v*`) to the repository
-- Use `task compile` to build a binary for the current platform locally
-- Use `task compile:all` to build all 4 platform binaries locally
-
-## MCP Server Best Practices
+## MCP Server
 
 - Follow the official Model Context Protocol specification
-- Implement proper error handling and validation for all tool inputs
-- Use clear, descriptive tool names and parameter definitions
-- Provide comprehensive tool descriptions for AI consumption
+- Proper error handling and validation for all tool inputs
+- Clear, descriptive tool names and parameter definitions
+- Comprehensive tool descriptions for AI consumption
