@@ -59,5 +59,8 @@
     "lefthook": "2.1.6",
     "express": "^5.3.0",
     "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "@hono/node-server": "^2.1.3"
   }
 }
