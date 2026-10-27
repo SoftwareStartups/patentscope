@@ -31,6 +31,10 @@ tasks:
       - bun build src/index.ts --compile --target=bun-darwin-arm64 --outfile dist/patentscope-darwin-arm64
       - bun build src/index.ts --compile --target=bun-windows-x64 --outfile dist/patentscope-windows-x64.exe
       - bun build src/index.ts --compile --target=bun-windows-arm64 --outfile dist/patentscope-windows-arm64.exe
+      - cmd: codesign --force --sign - dist/patentscope-darwin-x64 dist/patentscope-darwin-arm64
+        platforms: [darwin]
+      - cmd: codesign --verify --verbose dist/patentscope-darwin-x64 dist/patentscope-darwin-arm64
+        platforms: [darwin]
 
   clean:
     desc: Remove build artifacts
