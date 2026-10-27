@@ -16,6 +16,10 @@ tasks:
     cmds:
       - mkdir -p dist
       - bun build src/index.ts --compile --outfile dist/patentscope
+      - cmd: codesign --force --sign - dist/patentscope
+        platforms: [darwin]
+      - cmd: codesign --verify --verbose dist/patentscope
+        platforms: [darwin]
 
   compile:all:
     desc: Compile release binaries for all platforms (linux/darwin/windows × x64/arm64)
